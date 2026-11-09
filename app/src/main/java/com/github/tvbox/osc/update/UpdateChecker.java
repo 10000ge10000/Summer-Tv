@@ -52,6 +52,11 @@ public final class UpdateChecker {
 
         /** 无更新或检查失败，静默处理即可。已在主线程回调。 */
         void onNoUpdate();
+
+        /** 网络失败或版本文件无法解析（区别于"确认没有新版本"）。默认按无更新处理。已在主线程回调。 */
+        default void onCheckFailed() {
+            onNoUpdate();
+        }
     }
 
     public interface DownloadCallback {
@@ -78,7 +83,7 @@ public final class UpdateChecker {
             synchronized (UpdateChecker.class) {
                 if (client == null) {
                     client = new OkHttpClient.Builder()
-                            .connectTimeout(15, TimeUnit.SECONDS)
+                            .connectTimeout(6, TimeUnit.SECONDS)
                             .readTimeout(60, TimeUnit.SECONDS)
                             .followSslRedirects(false)
                             .build();
@@ -95,26 +100,40 @@ public final class UpdateChecker {
         }
         IO.execute(() -> {
             UpdateInfo info = null;
-            try {
-                // update.json 托管在 GitHub Releases（latest/download 会 302 到 GitHub 的文件 CDN），
-                // 不再附带版本、渠道等查询参数
-                Request request = new Request.Builder().url(endpoint).get().build();
-                try (Response response = client().newCall(request).execute()) {
-                    ResponseBody body = response.body();
-                    if (response.isSuccessful() && body != null) {
-                        info = new Gson().fromJson(body.string(), UpdateInfo.class);
-                        if (info != null) {
-                            info.selectVariant(BuildConfig.FLAVOR);
+            // 404 表示还没有发布任何 Release，属于"没有新版本"；所有源都连不上才算检查失败
+            boolean failed = true;
+            for (String prefix : UpdateMirrors.candidates(endpoint)) {
+                try {
+                    // update.json 托管在 GitHub Releases（latest/download 会 302 到 GitHub 的文件 CDN）
+                    Request request = new Request.Builder().url(prefix + endpoint).get().build();
+                    try (Response response = client().newCall(request).execute()) {
+                        ResponseBody body = response.body();
+                        if (response.isSuccessful() && body != null) {
+                            UpdateInfo parsed = new Gson().fromJson(body.string(), UpdateInfo.class);
+                            if (parsed != null && parsed.versionCode > 0) {
+                                parsed.selectVariant(BuildConfig.FLAVOR);
+                                info = parsed;
+                                failed = false;
+                                UpdateMirrors.remember(prefix);
+                                break;
+                            }
+                        } else if (response.code() == 404 && prefix.isEmpty()) {
+                            // GitHub 直连明确返回 404：还没有任何 Release，不必再试镜像
+                            failed = false;
+                            break;
                         }
                     }
+                } catch (Throwable th) {
+                    LOG.e("Update check failed via " + (prefix.isEmpty() ? "github" : prefix) + ": " + th.getMessage());
                 }
-            } catch (Throwable th) {
-                LOG.e("Update check failed: " + th.getMessage());
             }
             final UpdateInfo result = info;
+            final boolean checkFailed = failed;
             MAIN.post(() -> {
                 if (result != null && result.isValid() && result.versionCode > BuildConfig.VERSION_CODE) {
                     callback.onUpdateAvailable(result);
+                } else if (checkFailed) {
+                    callback.onCheckFailed();
                 } else {
                     callback.onNoUpdate();
                 }
@@ -137,16 +156,42 @@ public final class UpdateChecker {
                     throw new IllegalStateException("无法创建下载目录");
                 }
                 File file = new File(dir, "update-" + info.versionCode + ".apk");
+                // 之前静默下载过且校验仍然通过：直接复用，不重复下载
+                if (file.isFile() && info.sha256.equalsIgnoreCase(sha256(file))
+                        && isSignedBySameCertificate(app, file)) {
+                    final File cached = file;
+                    MAIN.post(() -> callback.onReady(cached));
+                    return;
+                }
                 //noinspection ResultOfMethodCallIgnored
                 file.delete();
 
-                Request request = new Request.Builder().url(info.apkUrl).get().build();
-                try (Response response = client().newCall(request).execute()) {
-                    ResponseBody body = response.body();
-                    if (!response.isSuccessful() || body == null) {
-                        throw new IllegalStateException("下载失败：HTTP " + response.code());
+                String lastError = "下载失败";
+                boolean downloaded = false;
+                for (String prefix : UpdateMirrors.candidates(info.apkUrl)) {
+                    try {
+                        Request request = new Request.Builder().url(prefix + info.apkUrl).get().build();
+                        try (Response response = client().newCall(request).execute()) {
+                            ResponseBody body = response.body();
+                            if (!response.isSuccessful() || body == null) {
+                                throw new IllegalStateException("下载失败：HTTP " + response.code());
+                            }
+                            writeToFile(body, file, callback);
+                        }
+                        if (info.sha256.equalsIgnoreCase(sha256(file))) {
+                            downloaded = true;
+                            break;
+                        }
+                        lastError = "安装包校验失败，已丢弃";
+                    } catch (Throwable th) {
+                        lastError = th.getMessage() == null ? "下载失败" : th.getMessage();
+                        LOG.e("Update download failed via " + (prefix.isEmpty() ? "github" : prefix) + ": " + lastError);
                     }
-                    writeToFile(body, file, callback);
+                    //noinspection ResultOfMethodCallIgnored
+                    file.delete();
+                }
+                if (!downloaded) {
+                    throw new IllegalStateException(lastError);
                 }
 
                 String actual = sha256(file);

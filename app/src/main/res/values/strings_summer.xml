@@ -7,8 +7,11 @@
     <string name="update_check">Check for updates</string>
     <string name="update_checking">Checking for updates…</string>
     <string name="update_latest">You are on the latest version</string>
+    <string name="update_failed">Can\'t reach GitHub, try again later</string>
     <string name="update_need_permission">To install the update, allow Summer TV to install unknown apps in system settings, then come back and installation will continue.</string>
     <string name="update_go_settings">Open settings</string>
+    <string name="update_ready">Version %1$s has been downloaded and verified.</string>
+    <string name="update_install_now">Install now</string>
     <string name="about_analytics">Anonymous analytics: %1$s</string>
     <string name="about_analytics_note">On by default. Only app version, channel, device type, playback scene and a random install ID are sent; no source URLs or search terms. You can turn it off at any time.</string>
     <string name="about_scroll_hint">Use Up / Down to scroll</string>

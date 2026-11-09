@@ -3,6 +3,7 @@ package com.github.tvbox.osc.update;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
@@ -33,17 +34,46 @@ public final class UpdateManager {
     private UpdateManager() {
     }
 
+    /** 本进程内是否已经发起过自动检查（检查 + 静默下载只做一次） */
+    private static boolean autoCheckStarted;
+
+    /**
+     * 进入首页时自动静默检查；发现新版本先在后台下载并校验，完成后再提示安装。
+     * 计费网络（手机流量）下不自动下载，改为先提示、由用户决定是否下载。
+     */
     public static void checkOnHome(final Activity activity) {
-        if (activity == null || activity.isFinishing() || promptedThisSession) return;
+        if (activity == null || activity.isFinishing() || promptedThisSession || autoCheckStarted) return;
         String endpoint = activity.getString(R.string.update_check_url);
         if (endpoint == null || endpoint.trim().isEmpty()) return;
+        autoCheckStarted = true;
 
         UpdateChecker.check(endpoint.trim(), new UpdateChecker.Callback() {
             @Override
             public void onUpdateAvailable(UpdateInfo info) {
                 if (activity.isFinishing()) return;
-                promptedThisSession = true;
-                promptUpdate(activity, info);
+                if (isMetered(activity)) {
+                    promptedThisSession = true;
+                    promptUpdate(activity, info);
+                    return;
+                }
+                UpdateChecker.download(activity, info, new UpdateChecker.DownloadCallback() {
+                    @Override
+                    public void onProgress(int percent) {
+                    }
+
+                    @Override
+                    public void onReady(File file) {
+                        if (activity.isFinishing() || promptedThisSession) return;
+                        promptedThisSession = true;
+                        promptInstall(activity, info, file);
+                    }
+
+                    @Override
+                    public void onFailed(String reason) {
+                        // 静默下载失败不打扰用户，下次启动再试；关于页仍可手动检查
+                        LOG.e("Silent update download failed: " + reason);
+                    }
+                });
             }
 
             @Override
@@ -72,6 +102,13 @@ public final class UpdateManager {
                     Toast.makeText(activity, R.string.update_latest, Toast.LENGTH_SHORT).show();
                 }
             }
+
+            @Override
+            public void onCheckFailed() {
+                if (!activity.isFinishing()) {
+                    Toast.makeText(activity, R.string.update_failed, Toast.LENGTH_LONG).show();
+                }
+            }
         });
     }
 
@@ -83,6 +120,45 @@ public final class UpdateManager {
         pendingInstall = null;
         if (apk.exists()) {
             launchInstaller(activity, apk);
+        }
+    }
+
+    /** 新版本已在后台下载并通过校验，提示安装 */
+    private static void promptInstall(final Activity activity, final UpdateInfo info, final File apk) {
+        StringBuilder message = new StringBuilder();
+        message.append(activity.getString(R.string.update_ready, info.versionName));
+        if (info.releaseNote != null && !info.releaseNote.trim().isEmpty()) {
+            message.append("\n\n").append(info.releaseNote.trim());
+        }
+        String left = info.forceUpdate ? "退出" : "稍后";
+        TipDialog dialog = new TipDialog(activity, message.toString(), left,
+                activity.getString(R.string.update_install_now),
+                new TipDialog.OnListener() {
+                    @Override
+                    public void left() {
+                        if (info.forceUpdate) {
+                            activity.finish();
+                        }
+                    }
+
+                    @Override
+                    public void right() {
+                        install(activity, apk);
+                    }
+
+                    @Override
+                    public void cancel() {
+                    }
+                });
+        dialog.show();
+    }
+
+    private static boolean isMetered(Context context) {
+        try {
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            return cm != null && cm.isActiveNetworkMetered();
+        } catch (Throwable th) {
+            return false;
         }
     }
 
