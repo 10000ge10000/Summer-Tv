@@ -7,8 +7,8 @@ def static buildTime() {
     return new Date().format("yyyyMMdd_HHmm", TimeZone.getTimeZone("GMT+08:00"))
 }
 
-def appVersionCode = 18
-def appVersionName = "1.0.18"
+def appVersionCode = 19
+def appVersionName = "1.0.19"
 def releaseStoreFilePath = (findProperty("YIWANTV_RELEASE_STORE_FILE") ?: System.getenv("YIWANTV_RELEASE_STORE_FILE")) as String
 def releaseStorePassword = (findProperty("YIWANTV_RELEASE_STORE_PASSWORD") ?: System.getenv("YIWANTV_RELEASE_STORE_PASSWORD")) as String
 def releaseKeyAlias = (findProperty("YIWANTV_RELEASE_KEY_ALIAS") ?: System.getenv("YIWANTV_RELEASE_KEY_ALIAS")) as String
