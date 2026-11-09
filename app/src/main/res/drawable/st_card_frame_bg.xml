@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 海报卡片底色：封面未加载时的占位色，同时为 RoundClipFrameLayout 提供圆角裁切轮廓 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <corners android:radius="@dimen/st_radius_card" />
+    <solid android:color="@color/st_surface" />
+</shape>

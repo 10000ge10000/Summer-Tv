@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 搜索输入框（UI 重构阶段 C）：默认半透明底加细描边，聚焦时描边变为主题色 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_card" />
+            <solid android:color="@color/st_surface_strong" />
+            <stroke android:width="@dimen/st_focus_stroke" android:color="?attr/color_theme" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_card" />
+            <solid android:color="@color/st_surface" />
+            <stroke android:width="@dimen/vs_1" android:color="@color/st_stroke" />
+        </shape>
+    </item>
+</selector>

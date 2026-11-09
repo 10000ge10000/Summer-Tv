@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 海报片名：未聚焦也保持接近白色（st_text_title_idle），聚焦时为纯主文字色；
+     评分、集数等副信息仍用次要文字色，与片名拉开层级 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/st_text_primary" android:state_focused="true" />
+    <item android:color="@color/st_text_title_idle" />
+</selector>

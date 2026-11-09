@@ -1,0 +1,4 @@
+rootProject.name = "YiWanTV"
+include ':app'
+include ':quickjs'
+include ':pyramid'

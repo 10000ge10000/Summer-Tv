@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 首页分类胶囊 Tab（UI 重构阶段 B）：聚焦为实心浅色胶囊，当前分类为半透明胶囊 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_pill" />
+            <solid android:color="@color/st_text_primary" />
+        </shape>
+    </item>
+    <item android:state_activated="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_pill" />
+            <solid android:color="@color/st_surface_strong" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_pill" />
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+</selector>

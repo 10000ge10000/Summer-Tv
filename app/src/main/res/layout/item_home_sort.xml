@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 首页分类 Tab：胶囊样式，焦点/当前分类状态由 st_tab_pill 与 st_tab_text 根据 focused/activated 切换 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/st_pill_height"
+    android:layout_gravity="center_vertical"
+    android:background="@drawable/st_tab_pill"
+    android:clickable="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/st_tab_padding_h"
+    android:paddingRight="@dimen/st_tab_padding_h">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:duplicateParentState="true"
+        android:focusable="false"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:singleLine="true"
+        android:textColor="@color/st_tab_text"
+        android:textSize="@dimen/st_text_tab" />
+
+    <ImageView
+        android:id="@+id/tvFilter"
+        android:layout_width="@dimen/st_tab_icon"
+        android:layout_height="@dimen/st_tab_icon"
+        android:layout_marginStart="@dimen/vs_6"
+        android:layout_marginLeft="@dimen/vs_6"
+        android:src="@drawable/icon_filter"
+        android:visibility="gone" />
+</LinearLayout>

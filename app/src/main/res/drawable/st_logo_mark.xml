@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Summer TV 标志：圆角播放三角 + 右上角的太阳圆点。与启动图标、Banner 同一几何（tools/logo 生成） -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="21dp"
+    android:height="24dp"
+    android:viewportWidth="53"
+    android:viewportHeight="61">
+    <!-- 画布紧贴图形裁切，左缘就是三角左缘，便于与文字左对齐 -->
+    <group
+        android:translateX="-23.5"
+        android:translateY="-19.5">
+    <path
+        android:fillColor="#FF8A50"
+        android:pathData="M23.5,32 L23.5,73 Q23.5,80.5 29.98,76.72 L65.02,56.28 Q71.5,52.5 65.02,48.72 L29.98,28.28 Q23.5,24.5 23.5,32 Z" />
+    <path
+        android:fillColor="#FFC56B"
+        android:pathData="M58.5,28.5 A9,9 0,1 1,76.5,28.5 A9,9 0,1 1,58.5,28.5 Z" />
+    </group>
+</vector>

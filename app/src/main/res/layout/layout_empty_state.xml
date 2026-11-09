@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 列表空状态（UI 重构阶段 C）：图标 + 标题 + 说明，由 EmptyState.create 填充文字 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/vs_480"
+    android:focusable="false"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="@dimen/vs_100"
+        android:layout_height="@dimen/vs_100"
+        android:alpha="0.5"
+        android:src="@drawable/icon_empty" />
+
+    <TextView
+        android:id="@+id/tvEmptyTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/vs_20"
+        android:textAppearance="@style/TextAppearance.Summer.Title" />
+
+    <TextView
+        android:id="@+id/tvEmptyHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/vs_8"
+        android:textAppearance="@style/TextAppearance.Summer.Body" />
+</LinearLayout>

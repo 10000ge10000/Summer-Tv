@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 圆形图标按钮（历史 / 收藏页的删除、清空）：聚焦为主题色实心，默认半透明 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="oval">
+            <solid android:color="?attr/color_theme" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/st_surface" />
+        </shape>
+    </item>
+</selector>

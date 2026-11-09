@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Summer TV 第三轮重构新增文案（单独成文件，避免与直播模块的 strings.xml 改动冲突） -->
+<resources>
+    <string name="hm_hero_source_douban">Douban Hot</string>
+    <string name="about_eyebrow">ABOUT</string>
+    <string name="hm_about">About</string>
+    <string name="update_check">Check for updates</string>
+    <string name="update_checking">Checking for updates…</string>
+    <string name="update_latest">You are on the latest version</string>
+    <string name="update_need_permission">To install the update, allow Summer TV to install unknown apps in system settings, then come back and installation will continue.</string>
+    <string name="update_go_settings">Open settings</string>
+    <string name="about_analytics">Anonymous analytics: %1$s</string>
+    <string name="about_analytics_note">On by default. Only app version, channel, device type, playback scene and a random install ID are sent; no source URLs or search terms. You can turn it off at any time.</string>
+    <string name="about_scroll_hint">Use Up / Down to scroll</string>
+</resources>

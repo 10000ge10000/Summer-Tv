@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 主操作按钮（播放）：默认主题色实心，聚焦为浅色实心 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_pill" />
+            <solid android:color="@color/st_text_primary" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_pill" />
+            <solid android:color="?attr/color_theme" />
+        </shape>
+    </item>
+</selector>

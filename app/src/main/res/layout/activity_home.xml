@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 首页顶部栏 -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 氛围背景（UI 重构阶段 B）：当前焦点海报的模糊图，两层交叉淡入；位于最底层，不参与焦点 -->
+    <FrameLayout
+        android:id="@+id/ambientLayer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:importantForAccessibility="noHideDescendants"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/ivAmbientA"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0"
+            android:scaleType="centerCrop" />
+
+        <ImageView
+            android:id="@+id/ivAmbientB"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0"
+            android:scaleType="centerCrop" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/st_backdrop_scrim" />
+    </FrameLayout>
+
+    <!-- 左侧导航栏：搜索 / 历史 / 收藏 / 直播，各分类页常驻，独占左侧一列 -->
+    <LinearLayout
+        android:id="@+id/navRail"
+        android:layout_width="@dimen/st_rail_width"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/navSearch"
+            android:layout_width="@dimen/st_rail_item_size"
+            android:layout_height="@dimen/st_rail_item_size"
+            android:layout_marginTop="@dimen/vs_0"
+            android:background="@drawable/st_rail_item"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="@dimen/st_rail_icon"
+                android:layout_height="@dimen/st_rail_icon"
+                android:duplicateParentState="true"
+                app:srcCompat="@drawable/hm_search" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vs_0"
+                android:duplicateParentState="true"
+                android:singleLine="true"
+                android:text="@string/hm_search"
+                android:textColor="@color/st_rail_text"
+                android:textSize="@dimen/st_text_caption" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navHistory"
+            android:layout_width="@dimen/st_rail_item_size"
+            android:layout_height="@dimen/st_rail_item_size"
+            android:layout_marginTop="@dimen/vs_10"
+            android:background="@drawable/st_rail_item"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="@dimen/st_rail_icon"
+                android:layout_height="@dimen/st_rail_icon"
+                android:duplicateParentState="true"
+                app:srcCompat="@drawable/hm_history" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vs_10"
+                android:duplicateParentState="true"
+                android:singleLine="true"
+                android:text="@string/hm_hist"
+                android:textColor="@color/st_rail_text"
+                android:textSize="@dimen/st_text_caption" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navCollect"
+            android:layout_width="@dimen/st_rail_item_size"
+            android:layout_height="@dimen/st_rail_item_size"
+            android:layout_marginTop="@dimen/vs_10"
+            android:background="@drawable/st_rail_item"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="@dimen/st_rail_icon"
+                android:layout_height="@dimen/st_rail_icon"
+                android:duplicateParentState="true"
+                app:srcCompat="@drawable/hm_fav" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vs_10"
+                android:duplicateParentState="true"
+                android:singleLine="true"
+                android:text="@string/hm_fav"
+                android:textColor="@color/st_rail_text"
+                android:textSize="@dimen/st_text_caption" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navLive"
+            android:layout_width="@dimen/st_rail_item_size"
+            android:layout_height="@dimen/st_rail_item_size"
+            android:layout_marginTop="@dimen/vs_10"
+            android:background="@drawable/st_rail_item"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="@dimen/st_rail_icon"
+                android:layout_height="@dimen/st_rail_icon"
+                android:duplicateParentState="true"
+                app:srcCompat="@drawable/hm_live" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vs_10"
+                android:duplicateParentState="true"
+                android:singleLine="true"
+                android:text="@string/hm_live"
+                android:textColor="@color/st_rail_text"
+                android:textSize="@dimen/st_text_caption" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/contentLayout"
+        android:layout_width="@dimen/vs_0"
+        android:layout_height="@dimen/vs_0"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/navRail"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.github.tvbox.osc.ui.tv.widget.NoScrollViewPager
+            android:id="@+id/mViewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <!-- 顶栏背后的渐变遮罩：顶栏浮在全屏内容上方，随列表滚动与顶栏一起淡出 -->
+    <View
+        android:id="@+id/topScrim"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/st_top_scrim_height"
+        android:background="@drawable/st_topbar_scrim"
+        android:importantForAccessibility="no"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 顶栏（首页三次重构）：浮在全屏内容上方；首页随列表滚动平滑淡出，不再 GONE 导致跳帧 -->
+    <LinearLayout
+        android:id="@+id/topLayout"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/st_top_bar_height"
+        android:layout_marginTop="@dimen/vs_20"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/st_rail_inset"
+        android:paddingRight="@dimen/vs_40"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- 应用内小标志（第三轮：替代原橙色竖条），后面跟小一号的 Summer TV 字标；点标志或字标打开关于页 -->
+        <ImageView
+            android:id="@+id/stLogoMark"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/st_logo_mark_size"
+            android:adjustViewBounds="true"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="@dimen/vs_8"
+            android:layout_marginRight="@dimen/vs_8"
+            android:importantForAccessibility="no"
+            app:srcCompat="@drawable/st_logo_mark" />
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="@dimen/vs_20"
+            android:layout_marginRight="@dimen/vs_20"
+            android:clickable="true"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:focusableInTouchMode="false"
+            android:gravity="left|center_vertical"
+            android:nextFocusRight="@id/mGridViewCategory"
+            android:nextFocusDown="@id/mViewPager"
+            android:singleLine="true"
+            android:text="@string/app_name"
+            android:textAlignment="gravity"
+            android:textColor="@color/font_home_selector"
+            android:background="@drawable/shape_toplayout_tvname"
+            android:textSize="@dimen/st_text_logo"
+            android:textStyle="bold" />
+
+        <!-- 分类标签居中：两侧等权留白；topBarBalance 在代码里设成左侧标志区的宽度，使标签相对整屏居中 -->
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <com.owen.tvrecyclerview.widget.TvRecyclerView
+            android:id="@+id/mGridViewCategory"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:nextFocusLeft="@id/tvName"
+            android:nextFocusDown="@id/mViewPager"
+            app:tv_selectedItemIsCentered="true" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <Space
+            android:id="@+id/topBarBalance"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/tvWifi"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/tvFind"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/tvStyle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/tvDrawer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/tvMenu"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <!-- 浮动焦点框（UI 重构阶段 B）：最上层、不可聚焦，跟随焦点在海报卡片间滑动 -->
+    <com.github.tvbox.osc.ui.tv.widget.FocusRingView
+        android:id="@+id/focusRing"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 开屏动画（第三轮）：盖在首页最上层，动画期间首页在下面照常加载数据；
+         首帧前就可见，动画放满 1.8 秒且首页数据就绪（最长 4 秒）后淡出并移除 -->
+    <FrameLayout
+        android:id="@+id/splashOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/st_bg"
+        android:clickable="true"
+        android:focusable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/splashMark"
+                android:layout_width="@dimen/vs_150"
+                android:layout_height="@dimen/vs_150"
+                android:alpha="0"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/st_logo_mark" />
+
+            <TextView
+                android:id="@+id/splashName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vs_14"
+                android:alpha="0"
+                android:letterSpacing="0.04"
+                android:text="@string/app_name"
+                android:textColor="@color/st_text_primary"
+                android:textSize="@dimen/st_text_title"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

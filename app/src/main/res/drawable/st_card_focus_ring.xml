@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 海报卡片描边：作为前景叠在封面之上；获得焦点时变为主色粗描边 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_card" />
+            <stroke android:width="@dimen/st_focus_stroke" android:color="?attr/color_theme" />
+        </shape>
+    </item>
+    <!-- 未聚焦：外圈 18% 白细边勾出卡片轮廓，内圈 1mm 暗边压住封面边缘，相邻海报更容易分辨 -->
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="@dimen/st_radius_card" />
+                    <stroke android:width="@dimen/st_card_stroke" android:color="@color/st_card_stroke" />
+                </shape>
+            </item>
+            <item
+                android:bottom="@dimen/st_card_stroke"
+                android:left="@dimen/st_card_stroke"
+                android:right="@dimen/st_card_stroke"
+                android:top="@dimen/st_card_stroke">
+                <shape android:shape="rectangle">
+                    <corners android:radius="@dimen/st_radius_card_inner" />
+                    <stroke android:width="1mm" android:color="#59000000" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</selector>

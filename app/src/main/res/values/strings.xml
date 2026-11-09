@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Summer TV</string>
+    <string name="app_home">Home</string>
+    <string name="app_source">https://tv2.910501.xyz/api/tvbox/config?format=json&amp;mode=fast</string>
+    <string name="commercial_config_url">https://tv2.910501.xyz/api/yiwantv/commercial/config</string>
+    <string name="commercial_config_pin_primary" translatable="false"></string>
+    <string name="commercial_config_pin_backup" translatable="false"></string>
+    <string name="update_check_url">https://github.com/10000ge10000/Summer-Tv/releases/latest/download/update.json</string>
+    <string name="commercial_config_public_key">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr0uU2okcwvzAj9ysV9kbZSoWYlN4Y0aJQtD8G8D/BD6qIxYVXEO/kbSbySIKbepYRG6vyIJzbPJSZKctGxtu0sBQbwZwPKM9OOj9/yIATCNwtyWsNQ0S2R5KJfYvGuE2d4nHcgFdWUQL7WOnG/LSgyQbyLrsHZMCwq3frGgVSzt4XPpFcZ8nIF6yRZMJi3hyXDXVY79Kqxn3Ngusglp7gXGgkB5kzp13CKJVvTEtq+YTkPpFdn2LoV7F8E2v/+ueDZqXbB1b4MJQYeNy9yxwhtg5ZBUlb91FGVk2hrb19bePGKdbfb8aprbkCOxgNkjcYrHYT4ykH4nULiPwIDAQAB</string>
+    <string name="about_content">Summer TV\n\nA customized Android TV player based on open source TVBox projects. Distributed by sideloading; not published on any app store.\n\nContent notice: This app only provides player, playback control and configuration management. It does not produce, store, upload, transcode or distribute media. This build ships a default configuration containing third-party site and live-stream endpoints. Those services are neither operated nor endorsed by this project. This build always uses the bundled configuration; the app provides no configuration address entry.\n\nPrivacy: No third-party advertising, analytics, payment or push SDK is bundled, and no Advertising ID permission is requested. The app does include its own remote configuration, ad placement and anonymous analytics. Analytics is on by default and can be switched off at any time under About - Anonymous Analytics. While off, nothing is collected, queued or sent, and server-side configuration cannot override that. When on it reports app version, channel, device type, playback scene and a randomly generated install identifier (not a hardware serial; reset on reinstall). Turning it off again immediately clears any queue not yet sent. Source URLs, configuration addresses and raw search terms are not uploaded.\n\nDouban: the home Featured pick and poster wall request Douban public endpoints for trending lists, synopses and posters, without any account or device identifier.\n\nUpdates: on the home screen and when you tap About - Check for updates, the app reads the version file from this project\'s GitHub Releases; downloads are verified by SHA-256 and signing certificate before installing.\n\nTo rank playable sources first, the app records per-site and per-line start success, failures and start time on this device only; it is never uploaded.\n\nLocal data such as configuration, playback preferences, history, favourites, cache and crash logs stays on this device and is not uploaded automatically.\n\nOpen source: Based on CatVodTVOfficial/TVBoxOSC and takagen99/Box, licensed under AGPL-3.0. Recipients of this build are entitled to the corresponding complete source code. See LICENSE and NOTICE.md.</string>
+    <string name="about_version">Version: v%1$s</string>
+
+    // Home Page //
+    <string name="hm_ok">Load Complete</string>
+    <string name="hm_notok">Load Fail</string>
+    <string name="hm_retry">Retry</string>
+    <string name="ad_open_failed">Cannot open link</string>
+    <string name="hm_cancel">Cancel</string>
+    <string name="hm_no_config">The bundled configuration failed to load.\n\nPlease check your network and retry.</string>
+    <string name="hm_no_config_goto">Retry</string>
+    <string name="hm_exit">Press BACK again to EXIT</string>
+    <string name="hm_exit_live">Press BACK again to exit LiveTV</string>
+    <string name="hm_date1">dd MMM</string>
+    <string name="hm_date2">EE HH:mm</string>
+    <string name="hm_hist">History</string>
+    <string name="hm_hero_featured">Featured</string>
+    <string name="hm_hero_continue">Continue Watching</string>
+    <string name="hm_hero_play">▶  Play now</string>
+    <string name="hm_hero_douban">Douban %s</string>
+    <string name="hm_live">LiveTV</string>
+    <string name="hm_search">Search</string>
+    <string name="hm_push">Push</string>
+    <string name="hm_file">Local</string>
+    <string name="hm_fav">Favorite</string>
+    <string name="hm_setting">Menu</string>
+    <string name="hm_style_line">Line View</string>
+    <string name="hm_style_grid">Grid View</string>
+    <string name="hm_hist_del">Removed from History</string>
+    <string name="hm_cache_del">Cache Cleared</string>
+
+    // Play Detail Page //
+    <string name="det_play">Play</string>
+    <string name="det_expand">Expand</string>
+    <string name="det_search">Search</string>
+    <string name="det_sort">Reverse</string>
+    <string name="det_sort_normal">Normal</string>
+    <string name="det_push">Push</string>
+    <string name="det_fav">Favorite</string>
+    <string name="det_fav_add">Added to Favorite</string>
+    <string name="det_fav_del">Removed from Favorite</string>
+    <string name="det_fav_star">★ Favorite</string>
+    <string name="det_fav_unstar">☆ Favorite</string>
+    <string name="det_url">Play URL Copied</string>
+    <string name="det_source"></string>
+    <string name="det_year">Year</string>
+    <string name="det_area">Area</string>
+    <string name="det_lang">Language</string>
+    <string name="det_type">Genre</string>
+    <string name="det_actor">Cast</string>
+    <string name="det_dir">Director</string>
+    <string name="det_des"></string>
+    <string name="det_desc">intro</string>
+
+    // Settings Menu Page //
+    <string name="mn_config">Config Address</string>
+    <string name="mn_home">Current Source</string>
+    <string name="mn_home_show">Show Source Name</string>
+    <string name="mn_home_type">Home Content</string>
+    <string name="mn_icon">Button</string>
+    <string name="mn_history_num">History</string>
+    <string name="mn_live_boot">Autostart Live</string>
+    <string name="mn_wall_change">Wallpaper</string>
+    <string name="mn_wall_load">Loading Wallpaper</string>
+    <string name="mn_wall_reset">Reset</string>
+    <string name="mn_play_type">Player</string>
+    <string name="mn_play_decode">Decode</string>
+    <string name="mn_search">Search Display</string>
+    <string name="mn_ratio">Screen Ratio</string>
+    <string name="mn_bgplay">Bgplay</string>
+    <string name="mn_preview">Preview Window</string>
+    <string name="mn_webview">WebView</string>
+    <string name="mn_render">Render</string>
+    <string name="mn_backup">Backup/Restore</string>
+    <string name="mn_dns">DNS</string>
+    <string name="mn_locale">Language</string>
+    <string name="mn_theme">Theme</string>
+    <string name="mn_about">About</string>
+    <string name="mn_analytics">Anonymous Analytics</string>
+    <string name="mn_analytics_on">Enable</string>
+    <string name="mn_purify">Playback Purify</string>
+    <string name="mn_ijk_cache_play">IJK Cache</string>
+    <string name="mn_reset">resetApp</string>
+    <string name="mn_fastsearch">Fast Search</string>
+
+    // Settings Dialog Pop-Up //
+    <string name="dia_source">Select Source</string>
+    <string name="dia_hm_type">Select Display Type</string>
+    <string name="dia_hm_icon">Home Icon Placement</string>
+    <string name="dia_history">Select History to Keep</string>
+    <string name="dia_history_list">Configuration History List</string>
+    <string name="dia_history_live">Live History List</string>
+    <string name="dia_history_epg">EPG History List</string>
+    <string name="dia_player">Select Player Type</string>
+    <string name="dia_decode">Select IJK Decoder</string>
+    <string name="dia_search">Select Search Mode</string>
+    <string name="dia_ratio">Select Screen Ratio</string>
+    <string name="dia_render">Select Render Mode</string>
+    <string name="dia_bkres">Backup / Restore</string>
+    <string name="dia_bkpkg">Select Backup Package</string>
+    <string name="dia_dns">Select DNS</string>
+    <string name="dia_locale">Select Language</string>
+    <string name="dia_theme">Select Theme</string>
+    <string name="dia_confirm">Confirm to Clear All ?</string>
+    <string name="dia_reset">Reset Clear Configuration</string>
+    <string name="dia_media_setting_title">Media Setting</string>
+    <string name="dia_analytics">Anonymous Analytics</string>
+    <string name="dia_analytics_desc">When enabled, the app reports app version, channel, device type and a randomly generated install identifier. Source URLs, configuration addresses and raw search terms are never uploaded. On by default; you can turn it off at any time.</string>
+
+
+    // Settings Backup Restore Page //
+    <string name="set_bkup_ok">Backup Success</string>
+    <string name="set_bkup_del">Backup Deleted</string>
+    <string name="set_bkup_fail">Backup Fail</string>
+    <string name="set_bkup_fail_hk">Backup Fail (Hawk)</string>
+    <string name="set_bkup_fail_db">Backup Fail (DB)</string>
+    <string name="set_rest_ok">Restore Success, Automatic Restart</string>
+    <string name="set_rest_fail_hk">Restore Fail (Hawk)</string>
+    <string name="set_rest_fail_db">Restore Fail (DB)</string>
+    <string name="set_permission_ok">Write Permission Granted</string>
+    <string name="set_permission_fail1">Failed to get Permission</string>
+    <string name="set_permission_fail2">Failed to get Permission, please grant in Settings</string>
+
+    // Activity Page //
+    <string name="act_app">Applications</string>
+    <string name="act_app_sel">Select to Uninstall</string>
+    <string name="act_app_rm">Uninstall</string>
+    <string name="act_fav">Favorite</string>
+    <string name="act_fav_sel">Select to Remove</string>
+    <string name="act_fav_rm">Remove</string>
+    <string name="act_drive">Drives</string>
+    <string name="act_hist">History</string>
+    <string name="st_empty_history">No watch history yet</string>
+    <string name="st_empty_history_hint">Titles you play will show up here</string>
+    <string name="st_empty_collect">No favorites yet</string>
+    <string name="st_empty_collect_hint">Press Favorite on a detail page to add one</string>
+    <string name="act_hist_sel">Select to Remove</string>
+    <string name="act_hist_rm">Remove</string>
+    <string name="act_live_play_empty_live_url">The live url is not configured, please go to the settings page to configure it</string>
+    <string name="act_live_play_empty_channel">The channel list is empty</string>
+    <string name="act_live_play_network_error">The network request for the live-streaming address failed</string>
+    <string name="act_search">Search</string>
+    <string name="act_search_clr">Clear</string>
+    <string name="act_search_del">Backspace</string>
+    <string name="act_search_rem">Remote</string>
+    <string name="act_search_trend">Trending</string>
+    <string name="act_search_txt">Enter Search Title</string>
+    <string name="act_settings">Summer TV Settings</string>
+    <string name="act_home">Home</string>
+    <string name="act_player">Player</string>
+    <string name="act_system">System</string>
+
+    // Search Page //
+    <string name="search_input">Input cannot be blank</string>
+    <string name="search_site">No source site selected</string>
+    <string name="search_checkAll">Select All</string>
+    <string name="search_clearAll">Select None</string>
+
+    // Fast Search Page //
+    <string name="fs_show_all">All</string>
+    <string name="fs_results">Search Results</string>
+    <string name="global_search">global search</string>
+    <string name="search">search</string>
+    <string name="Select_source">Select source</string>
+
+    // VOD //
+    <string name="vod_audio">Select Audio Track</string>
+    <string name="vod_no_audio">No Audio Track</string>
+    <string name="vod_sub_option">Subtitle Options</string>
+    <string name="vod_sub_sel">Select Subtitle</string>
+    <string name="vod_sub_na">No Internal Subtitle</string>
+    <string name="vod_sub_int">Internal</string>
+    <string name="vod_sub_ext">External</string>
+    <string name="vod_sub_remote">Search</string>
+    <string name="vod_sub_size">Size</string>
+    <string name="vod_sub_delay">Delay</string>
+    <string name="vod_sub_search">Search</string>
+    <string name="vod_sub_off">Subtitle Off</string>
+    <string name="vod_sub_on">Subtitle On</string>
+    <string name="vod_remaining_time">Remaining Time</string>
+    <string name="vod_ends_at">Ends at</string>
+
+    // EXO Player
+    <string name="exo_track_selection_title_video">Video</string>
+    <string name="exo_track_selection_title_audio">Audio</string>
+    <string name="exo_track_selection_title_text">Text</string>
+    <string name="exo_track_selection_none">None</string>
+    <string name="exo_track_selection_auto">Auto</string>
+    <string name="exo_track_unknown">Unknown</string>
+    <string name="exo_track_resolution">%1$d × %2$d</string>
+    <string name="exo_track_mono">Mono</string>
+    <string name="exo_track_stereo">Stereo</string>
+    <string name="exo_track_surround">Surround Sound</string>
+    <string name="exo_track_surround_5_point_1">5.1 Surround Sound</string>
+    <string name="exo_track_surround_7_point_1">7.1 Surround Sound</string>
+    <string name="exo_track_role_alternate">Alternate</string>
+    <string name="exo_track_role_supplementary">Supplementary</string>
+    <string name="exo_track_role_commentary">Commentary</string>
+    <string name="exo_track_role_closed_captions">CC</string>
+    <string name="exo_track_bitrate">%1$.2f Mbps</string>
+    <string name="exo_item_list">%1$s，%2$s</string>
+    <string name="sub_size">Size</string>
+    <string name="sub_delay">Delay</string>
+    <string name="sub_style">Style</string>
+    <string name="sub_style_text">ABC.</string>
+
+    <string-array name="doh_name">
+        <item>System</item>
+        <item>Tencent</item>
+        <item>Alibaba</item>
+        <item>360</item>
+    </string-array>
+
+    <string-array name="doh_url">
+        <item />
+        <item>https://doh.pub/dns-query</item>
+        <item>https://dns.alidns.com/dns-query</item>
+        <item>https://doh.360.cn/dns-query</item>
+    </string-array>
+
+    <!-- 视频设置 相关数据 -->
+    <string-array name="media_title_tag">
+        <item>General</item>
+        <item>ExoPlayer</item>
+        <item>IjkPlayer</item>
+    </string-array>
+
+    <string-array name="media_title">
+        <item>General</item>
+        <item>EXO</item>
+        <item>IJK</item>
+    </string-array>
+
+    <!--    用于解释怎么处理数据  -->
+    <string-array name="media_content_tag_General">
+        <item>VodPlayerPreferred</item>
+    </string-array>
+
+    <string-array name="media_content_tag_ExoPlayer">
+        <item>ExoRenderer</item>
+<!--        <item>ExoRendererMode</item>-->
+    </string-array>
+
+    <string-array name="media_content_tag_IjkPlayer">
+        <item>IjkMediaCodecMode</item>
+        <item>IjkCache</item>
+    </string-array>
+
+    <!--    用于展示名称-->
+    <string-array name="media_content_General">
+        <item>VodPlayerPreferred</item>
+        <!--        用于强制使用设置中的配置 比如设置 首选设置配置 ,首选配置文件 优先单独设置的就不管-->
+    </string-array>
+
+
+    <string-array name="media_content_ExoPlayer">
+        <!--  渲染器选择  -->
+        <item>Renderer</item>
+<!--        &lt;!&ndash;首选 扩展渲染器 核心渲染器 关 &ndash;&gt;-->
+<!--        <item>RendererMode</item>-->
+    </string-array>
+
+    <string-array name="media_content_IjkPlayer">
+        <item>MediaCodecMode</item>
+        <item>Cache</item>
+    </string-array>
+
+    <string-array name="media_content_ExoPlayer_renderer">
+        <item>Default</item>
+        <item>NextLib</item>
+    </string-array>
+
+    <string-array name="media_content_ExoPlayer_renderer_mode">
+        <item>Prefer core renderer</item>
+        <item>Prefer extension renderer</item>
+        <item>extended renderers are not allowed</item>
+    </string-array>
+
+    <string-array name="media_content_General_VodPlayerPreferred">
+        <item>Prefer configuration address</item>
+        <item>Prefer setting configuration</item>
+    </string-array>
+
+    <!-- 结束 视频设置 相关配置 -->
+
+    <!-- 直播模块 -->
+    <string name="live_channel_number_missing">Channel %d does not exist</string>
+    <string name="live_epg_no_info">No information</string>
+    <string name="live_epg_empty">No program information</string>
+    <string name="live_catchup_unsupported">Catch-up is not supported on this channel</string>
+    <string name="live_channel_unavailable">This channel is temporarily unavailable</string>
+    <string name="live_select_channel_first">Please select a channel first</string>
+    <string name="live_password_wrong">Wrong password</string>
+    <string name="live_line_format">Line %1$d/%2$d</string>
+    <string name="live_line_default_name">Line %d</string>
+    <string name="live_line_tag_recommended">Recommended</string>
+    <string name="live_line_tag_slow">Slow</string>
+    <string name="live_setting_group_line">Line</string>
+    <string name="live_setting_group_scale">Aspect ratio</string>
+    <string name="live_setting_group_decoder">Decoder</string>
+    <string name="live_setting_group_timeout">Timeout switch</string>
+    <string name="live_setting_group_pref">Preferences</string>
+    <string name="live_setting_group_exit">Exit live</string>
+    <string name="live_scale_default">Default</string>
+    <string name="live_scale_16_9">16:9</string>
+    <string name="live_scale_4_3">4:3</string>
+    <string name="live_scale_fill">Fill</string>
+    <string name="live_scale_original">Original</string>
+    <string name="live_scale_crop">Crop</string>
+    <string name="live_decoder_system">System</string>
+    <string name="live_decoder_exo">Exo</string>
+    <string name="live_timeout_off">Off</string>
+    <string name="live_timeout_seconds">%ds</string>
+    <string name="live_pref_show_time">Show time</string>
+    <string name="live_pref_show_speed">Show speed</string>
+    <string name="live_pref_reverse">Reverse channel keys</string>
+    <string name="live_pref_cross_group">Cross-group switching</string>
+    <string name="live_exit_confirm">Confirm</string>
+</resources>

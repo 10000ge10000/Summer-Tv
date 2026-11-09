@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 首页海报卡片（UI 重构阶段 B：标题移到封面下方，焦点描边改为主色；控件 ID 与原布局一致，适配器无需改动） -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
+
+    <!-- 封面容器：适配器会按站点图片比例改写它的宽高（ivThumb.getParent()） -->
+    <com.github.tvbox.osc.ui.tv.widget.RoundClipFrameLayout
+        android:id="@+id/mItemFrame"
+        android:layout_width="@dimen/vs_214"
+        android:layout_height="@dimen/vs_280"
+        android:background="@drawable/st_card_frame_bg"
+        android:duplicateParentState="true"
+        android:foreground="@drawable/st_card_focus_ring">
+
+        <ImageView
+            android:id="@+id/ivThumb"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/vs_8"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvYear"
+                style="@style/Summer.PosterBadge" />
+            <TextView
+                android:id="@+id/tvRate"
+                style="@style/Summer.PosterBadge"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/delFrameLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/shape_user_delete"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="@dimen/vs_80"
+                android:layout_height="@dimen/vs_80"
+                android:layout_gravity="center"
+                android:layout_marginBottom="@dimen/vs_20"
+                android:src="@drawable/icon_delete" />
+        </FrameLayout>
+    </com.github.tvbox.osc.ui.tv.widget.RoundClipFrameLayout>
+
+    <TextView
+        android:id="@+id/tvName"
+        style="@style/Summer.PosterTitle"
+        android:text="Title" />
+
+    <TextView
+        android:id="@+id/tvNote"
+        style="@style/Summer.PosterSubtitle" />
+</LinearLayout>

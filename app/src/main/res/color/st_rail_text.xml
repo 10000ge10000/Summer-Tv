@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 左侧导航栏文字：聚焦时在主题色底上用主文字色，默认次要文字色 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/st_text_primary" android:state_focused="true" />
+    <item android:color="@color/st_text_secondary" />
+</selector>

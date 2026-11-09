@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ 冷启动时系统会强制显示一屏「图标 + 背景」的 SplashScreen，然后才进入应用自己的开屏动画。
+     这里把系统那一屏的图标设为透明、背景设为开屏动画同色（st_bg），视觉上直接进入 Summer TV 开屏动画。
+     其余属性与 values/styles.xml 中的 AppTheme.NoActionBar 保持一致。 -->
+<resources>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/color_32364E</item>
+        <item name="android:windowSplashScreenBackground">@color/st_bg</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@android:color/transparent</item>
+    </style>
+
+</resources>

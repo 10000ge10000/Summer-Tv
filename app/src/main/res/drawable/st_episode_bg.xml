@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 选集格子：聚焦浅色实心，默认半透明 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_chip" />
+            <solid android:color="@color/st_text_primary" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_chip" />
+            <solid android:color="@color/st_surface" />
+        </shape>
+    </item>
+</selector>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 氛围背景遮罩：左侧和底部压暗，保证文字与海报在任何封面颜色上都清晰 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:centerColor="@color/st_scrim_soft"
+                android:endColor="@color/st_bg"
+                android:startColor="@color/st_scrim_soft"
+                android:type="linear" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="0"
+                android:centerColor="@color/st_scrim_soft"
+                android:endColor="@color/st_scrim_clear"
+                android:startColor="@color/st_scrim_strong"
+                android:type="linear" />
+        </shape>
+    </item>
+</layer-list>

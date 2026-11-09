@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 直播频道列表 / 节目单 / 设置浮层底板 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <corners android:radius="@dimen/st_radius_card" />
+    <solid android:color="@color/st_scrim_strong" />
+    <stroke android:width="1mm" android:color="@color/st_stroke" />
+</shape>

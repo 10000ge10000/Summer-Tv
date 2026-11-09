@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 搜索结果海报卡片（UI 重构阶段 C）：与首页卡片同一套样式，片名放到海报下方；保留原有控件 id -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:focusable="true"
+    android:orientation="vertical">
+
+    <com.github.tvbox.osc.ui.tv.widget.RoundClipFrameLayout
+        android:id="@+id/mItemFrame"
+        android:layout_width="@dimen/vs_185"
+        android:layout_height="@dimen/vs_260"
+        android:background="@drawable/st_card_frame_bg"
+        android:duplicateParentState="true"
+        android:foreground="@drawable/st_card_focus_ring">
+
+        <ImageView
+            android:id="@+id/ivThumb"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/tvSite"
+            style="@style/Summer.PosterBadge"
+            android:layout_gravity="top|start"
+            android:layout_margin="@dimen/vs_8" />
+
+        <TextView
+            android:id="@+id/tvNote"
+            style="@style/Summer.PosterBadge"
+            android:layout_gravity="bottom|start"
+            android:layout_margin="@dimen/vs_8" />
+    </com.github.tvbox.osc.ui.tv.widget.RoundClipFrameLayout>
+
+    <TextView
+        android:id="@+id/tvName"
+        style="@style/Summer.PosterTitle"
+        android:layout_width="@dimen/vs_185" />
+</LinearLayout>

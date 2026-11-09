@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Summer TV 第三轮重构新增文案（单独成文件，避免与直播模块的 strings.xml 改动冲突） -->
+<resources>
+    <string name="hm_hero_source_douban">豆瓣热播</string>
+    <string name="about_eyebrow">关于</string>
+    <string name="hm_about">关于</string>
+    <string name="update_check">检查更新</string>
+    <string name="update_checking">正在检查更新…</string>
+    <string name="update_latest">已是最新版本</string>
+    <string name="update_need_permission">安装更新需要允许 Summer TV「安装未知应用」。去系统设置打开后返回，会自动继续安装。</string>
+    <string name="update_go_settings">去设置</string>
+    <string name="about_analytics">匿名统计：%1$s</string>
+    <string name="about_analytics_note">默认开启，仅上报版本、渠道、设备类型、播放场景和随机安装标识，不传片源与搜索词；可随时关闭。</string>
+    <string name="about_scroll_hint">按上下键滚动阅读</string>
+</resources>

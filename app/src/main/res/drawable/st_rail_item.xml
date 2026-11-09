@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 左侧导航栏条目：聚焦为主题色实心圆角块，默认透明 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_card" />
+            <solid android:color="?attr/color_theme" />
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_card" />
+            <solid android:color="@color/st_surface_strong" />
+        </shape>
+    </item>
+    <item android:drawable="@android:color/transparent" />
+</selector>

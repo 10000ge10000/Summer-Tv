@@ -1,0 +1,232 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/color_32364E</item>
+        <item name="colorPrimaryDark">@color/color_32364E_40</item>
+        <item name="colorAccent">?attr/color_theme</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>//全屏即无通知栏
+        <item name="android:windowContentOverlay">@null</item>//是否有遮盖
+        <item name="windowNoTitle">true</item>
+        <!--        <item name="android:keepScreenOn">true</item>-->
+        <!-- Activity windows must be opaque on TV devices, otherwise transparent pages can expose
+             stale Surface buffers as colored noise during activity transitions. -->
+        <item name="android:windowBackground">@color/color_32364E</item>
+    </style>
+
+    <!-- Alternative Themes -->
+    <!-- 夏日主题：Summer TV 品牌默认配色（日落珊瑚橙，暗底高对比，满足 TV 焦点可见性） -->
+    <style name="SummerTheme" parent="AppTheme.NoActionBar">
+        <item name="color_theme">#FF8A50</item>
+        <item name="color_theme_80">#CCFF8A50</item>
+        <item name="color_theme_70">#B3FF8A50</item>
+        <item name="color_theme_60">#99FF8A50</item>
+        <item name="color_theme_50">#80FF8A50</item>
+        <item name="color_theme_40">#66FF8A50</item>
+        <item name="color_theme_dark_70">#B37A4127</item>
+    </style>
+    <style name="NetfxTheme" parent="AppTheme.NoActionBar">
+        <item name="color_theme">#4DA3FF</item>
+        <item name="color_theme_80">#CC4DA3FF</item>
+        <item name="color_theme_70">#B34DA3FF</item>
+        <item name="color_theme_60">#994DA3FF</item>
+        <item name="color_theme_50">#804DA3FF</item>
+        <item name="color_theme_40">#664DA3FF</item>
+        <item name="color_theme_dark_70">#B31A2027</item>
+    </style>
+    <style name="DoraeTheme" parent="AppTheme.NoActionBar">
+        <item name="color_theme">#18A2E7</item>
+        <item name="color_theme_80">#CC18A2E7</item>
+        <item name="color_theme_70">#B318A2E7</item>
+        <item name="color_theme_60">#9918A2E7</item>
+        <item name="color_theme_50">#8018A2E7</item>
+        <item name="color_theme_40">#6618A2E7</item>
+        <item name="color_theme_dark_70">#B3106D9C</item>
+    </style>
+    <style name="PepsiTheme" parent="AppTheme.NoActionBar">
+        <item name="color_theme">#004B93</item>
+        <item name="color_theme_80">#CC004B93</item>
+        <item name="color_theme_70">#B3004B93</item>
+        <item name="color_theme_60">#99004B93</item>
+        <item name="color_theme_50">#80004B93</item>
+        <item name="color_theme_40">#66004B93</item>
+        <item name="color_theme_dark_70">#B3002547</item>
+    </style>
+    <style name="NarutoTheme" parent="AppTheme.NoActionBar">
+        <item name="color_theme">#FF7439</item>
+        <item name="color_theme_80">#CCFF7439</item>
+        <item name="color_theme_70">#B3FF7439</item>
+        <item name="color_theme_60">#99FF7439</item>
+        <item name="color_theme_50">#80FF7439</item>
+        <item name="color_theme_40">#66FF7439</item>
+        <item name="color_theme_dark_70">#B3B35127</item>
+    </style>
+    <style name="MinionTheme" parent="AppTheme.NoActionBar">
+        <item name="color_theme">#FFD55E</item>
+        <item name="color_theme_80">#CCFFD55E</item>
+        <item name="color_theme_70">#B3FFD55E</item>
+        <item name="color_theme_60">#99FFD55E</item>
+        <item name="color_theme_50">#80FFD55E</item>
+        <item name="color_theme_40">#66FFD55E</item>
+        <item name="color_theme_dark_70">#B3B39542</item>
+    </style>
+    <style name="YagamiTheme" parent="AppTheme.NoActionBar">
+        <item name="color_theme">#FF2F70</item>
+        <item name="color_theme_80">#CCFF2F70</item>
+        <item name="color_theme_70">#B3FF2F70</item>
+        <item name="color_theme_60">#99FF2F70</item>
+        <item name="color_theme_50">#80FF2F70</item>
+        <item name="color_theme_40">#66FF2F70</item>
+        <item name="color_theme_dark_70">#B3B3204E</item>
+    </style>
+    <style name="SakuraTheme" parent="AppTheme.NoActionBar">
+        <item name="color_theme">#FD9BDB</item>
+        <item name="color_theme_80">#CCFD9BDB</item>
+        <item name="color_theme_70">#B3FD9BDB</item>
+        <item name="color_theme_60">#99FD9BDB</item>
+        <item name="color_theme_50">#80FD9BDB</item>
+        <item name="color_theme_40">#66FD9BDB</item>
+        <item name="color_theme_dark_70">#B3B06B98</item>
+    </style>
+
+    <!-- 自定义dialog样式 -->
+    <style name="CustomDialogStyle" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+    <style name="CustomDialogStyleDim" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <!-- Volume / Brightness Bar -->
+    <style name="video_vertical_progressBar">
+        <item name="android:maxWidth">12dp</item>
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:indeterminateDrawable">
+            @android:drawable/progress_indeterminate_horizontal
+        </item>
+        <item name="android:progressDrawable">@drawable/play_progress_vertical</item>
+        <item name="android:indeterminateDuration">3500</item>
+        <item name="android:indeterminateBehavior">repeat</item>
+        <item name="android:minWidth">1dp</item>
+    </style>
+
+    <!-- Mini Progress Bar -->
+    <style name="video_horizontal_progressBar">
+        <item name="android:maxWidth">12dp</item>
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:indeterminateDrawable">
+            @android:drawable/progress_indeterminate_horizontal
+        </item>
+        <item name="android:progressDrawable">@drawable/play_progress_horizontal</item>
+        <item name="android:indeterminateDuration">3500</item>
+        <item name="android:indeterminateBehavior">repeat</item>
+        <item name="android:minWidth">1dp</item>
+    </style>
+
+    <style name="surfaceType_surface">
+        <item name="surface_type">surface_view</item>
+    </style>
+    <style name="surfaceType_texture">
+        <item name="surface_type">texture_view</item>
+    </style>
+    <!-- ===== Summer TV 设计 token：字号层级（UI 重构阶段 A） =====
+         对应 AGENTS.md：标题 26–32、正文 18–22、说明 14–16；Display 只用于 Hero 和详情页大标题。 -->
+    <style name="TextAppearance.Summer" parent="">
+        <item name="android:textColor">@color/st_text_primary</item>
+    </style>
+    <style name="TextAppearance.Summer.Display">
+        <item name="android:textSize">@dimen/st_text_display</item>
+        <item name="android:fontFamily">sans-serif-black</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+    <style name="TextAppearance.Summer.Display.Detail">
+        <item name="android:textSize">@dimen/st_text_display_detail</item>
+    </style>
+    <style name="TextAppearance.Summer.Title">
+        <item name="android:textSize">@dimen/st_text_title</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="TextAppearance.Summer.Subtitle">
+        <item name="android:textSize">@dimen/st_text_subtitle</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/st_text_secondary</item>
+    </style>
+    <style name="TextAppearance.Summer.Tab">
+        <item name="android:textSize">@dimen/st_text_tab</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/st_text_secondary</item>
+    </style>
+    <style name="TextAppearance.Summer.Body">
+        <item name="android:textSize">@dimen/st_text_body</item>
+        <item name="android:textColor">@color/st_text_secondary</item>
+    </style>
+    <style name="TextAppearance.Summer.Label">
+        <item name="android:textSize">@dimen/st_text_body</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/st_text_secondary</item>
+    </style>
+    <style name="TextAppearance.Summer.Caption">
+        <item name="android:textSize">@dimen/st_text_caption</item>
+        <item name="android:textColor">@color/st_text_tertiary</item>
+    </style>
+    <!-- ===== 海报卡片文字（UI 重构阶段 B） ===== -->
+    <style name="Summer.PosterTitle" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/vs_10</item>
+        <item name="android:paddingLeft">@dimen/vs_2</item>
+        <item name="android:paddingRight">@dimen/vs_2</item>
+        <item name="android:duplicateParentState">true</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textAppearance">@style/TextAppearance.Summer.Label</item>
+        <item name="android:textColor">@color/st_card_title</item>
+    </style>
+    <style name="Summer.PosterSubtitle" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/vs_2</item>
+        <item name="android:paddingLeft">@dimen/vs_2</item>
+        <item name="android:paddingRight">@dimen/vs_2</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textAppearance">@style/TextAppearance.Summer.Caption</item>
+    </style>
+    <style name="Summer.PosterBadge" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginRight">@dimen/vs_5</item>
+        <item name="android:layout_marginEnd">@dimen/vs_5</item>
+        <item name="android:background">@drawable/st_badge_bg</item>
+        <item name="android:paddingLeft">@dimen/vs_6</item>
+        <item name="android:paddingRight">@dimen/vs_6</item>
+        <item name="android:paddingTop">@dimen/vs_1</item>
+        <item name="android:paddingBottom">@dimen/vs_1</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxWidth">@dimen/vs_160</item>
+        <item name="android:textSize">@dimen/st_text_caption</item>
+        <item name="android:textColor">@color/st_text_primary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>

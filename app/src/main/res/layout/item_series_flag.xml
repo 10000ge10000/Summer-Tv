@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 播放线路 / 选集分组胶囊（UI 重构阶段 C）：选中态由适配器设置 activated，
+     tvSeriesFlagSelect 保留给适配器控制可见性，样式上不再显示下划线 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/st_pill_height"
+    android:layout_gravity="center_vertical"
+    android:background="@drawable/st_chip_pill"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/st_tab_padding_h"
+    android:paddingRight="@dimen/st_tab_padding_h">
+
+    <TextView
+        android:id="@+id/tvSeriesFlag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:duplicateParentState="true"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:singleLine="true"
+        android:text="SeriesFlag"
+        android:textColor="@color/st_tab_text"
+        android:textSize="@dimen/ts_18" />
+
+    <View
+        android:id="@+id/tvSeriesFlagSelect"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
+</LinearLayout>

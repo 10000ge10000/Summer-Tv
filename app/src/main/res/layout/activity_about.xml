@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 关于页（第三轮重构）：替代原 AboutDialog。左侧应用名与版本，右侧可滚动的说明正文；
+     正文复用 about_content，保证与 README / NOTICE 的披露一致。遥控器上下键滚动正文。 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/st_bg"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/vs_60"
+    android:paddingTop="@dimen/vs_50"
+    android:paddingRight="@dimen/vs_60"
+    android:paddingBottom="@dimen/vs_30">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="@dimen/vs_300"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/vs_50"
+            android:adjustViewBounds="true"
+            android:layout_marginBottom="@dimen/vs_14"
+            android:importantForAccessibility="no"
+            app:srcCompat="@drawable/st_logo_mark" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:letterSpacing="0.08"
+            android:text="@string/about_eyebrow"
+            android:textColor="?attr/color_theme"
+            android:textSize="@dimen/st_text_body"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/vs_8"
+            android:singleLine="true"
+            android:text="@string/app_name"
+            android:textColor="@color/st_text_primary"
+            android:textSize="@dimen/st_text_detail_title"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/aboutVersion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/vs_10"
+            android:textAppearance="@style/TextAppearance.Summer.Label"
+            android:textColor="@color/st_text_secondary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/vs_30"
+            android:text="@string/about_scroll_hint"
+            android:textAppearance="@style/TextAppearance.Summer.Caption"
+            android:textColor="@color/st_text_tertiary" />
+
+        <!-- 手动检查更新：读取 GitHub Releases 上的 update.json -->
+        <TextView
+            android:id="@+id/aboutUpdate"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/st_button_height_compact"
+            android:layout_marginTop="@dimen/vs_30"
+            android:background="@drawable/st_button_pill"
+            android:focusable="true"
+            android:gravity="center"
+            android:nextFocusRight="@id/aboutScroll"
+            android:paddingLeft="@dimen/st_button_padding_h"
+            android:paddingRight="@dimen/st_button_padding_h"
+            android:singleLine="true"
+            android:text="@string/update_check"
+            android:textColor="@color/st_button_text"
+            android:textSize="@dimen/st_text_body" />
+
+        <!-- 设置页移除后，匿名统计开关放在这里（默认开启，下方一行说明；重新开启前弹说明确认） -->
+        <TextView
+            android:id="@+id/aboutAnalytics"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/st_button_height_compact"
+            android:layout_marginTop="@dimen/vs_14"
+            android:background="@drawable/st_button_pill"
+            android:focusable="true"
+            android:gravity="center"
+            android:nextFocusRight="@id/aboutScroll"
+            android:paddingLeft="@dimen/st_button_padding_h"
+            android:paddingRight="@dimen/st_button_padding_h"
+            android:singleLine="true"
+            android:textColor="@color/st_button_text"
+            android:textSize="@dimen/st_text_body" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/vs_10"
+            android:maxWidth="@dimen/vs_300"
+            android:text="@string/about_analytics_note"
+            android:textAppearance="@style/TextAppearance.Summer.Caption"
+            android:textColor="@color/st_text_tertiary" />
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/aboutScroll"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/vs_40"
+        android:layout_weight="1"
+        android:focusable="true"
+        android:focusableInTouchMode="false"
+        android:nextFocusLeft="@id/aboutAnalytics"
+        android:scrollbars="vertical">
+
+        <TextView
+            android:id="@+id/aboutContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lineSpacingMultiplier="1.35"
+            android:paddingBottom="@dimen/vs_30"
+            android:text="@string/about_content"
+            android:textAppearance="@style/TextAppearance.Summer.Body"
+            android:textColor="@color/st_text_primary" />
+    </ScrollView>
+</LinearLayout>

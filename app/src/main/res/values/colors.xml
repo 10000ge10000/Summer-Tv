@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="color_FFB800">#FF6600</color>
+
+    <!-- Main Theme E50914 D81F26 -->
+    <color name="color_theme">#4DA3FF</color>
+    <color name="color_theme_80">#CC4DA3FF</color>
+    <color name="color_theme_70">#B34DA3FF</color>
+    <color name="color_theme_60">#994DA3FF</color>
+    <color name="color_theme_50">#804DA3FF</color>
+    <color name="color_theme_40">#664DA3FF</color>
+    <!-- Main Dialog Button BG -->
+    <color name="color_theme_dark_70">#B31A2027</color>
+
+    <!-- EPG Colors -->
+    <!-- 页面背景：阶段 B 起与 st_bg 同值（#0B0E12） -->
+    <color name="color_32364E">#0B0E12</color>
+    <color name="color_32364E_80">#CC0B0E12</color>
+    <color name="color_32364E_40">#660B0E12</color>
+    <color name="color_3D3D3D">#1A2027</color>
+    <color name="color_3D3D3D_45">#731A2027</color>
+    <color name="color_3D3D3D_50">#801A2027</color>
+	
+    <!-- 筛选界面背景颜色 -->
+    <color name="color_3D3D3D_80">#CC1A2027</color>
+
+    <!-- Live Menu BG (left / right) -->
+    <color name="color_0E0E0E_90">#E60E0E0E</color>
+
+    <!-- Main Dialog BG -->
+    <color name="color_6A6A6A_95">#F21A2027</color>
+
+    <color name="color_FFFFFF">#FFFFFF</color>
+    <color name="color_FFFFFF_90">#E6FFFFFF</color>
+    <color name="color_FFFFFF_80">#CCFFFFFF</color>
+    <color name="color_FFFFFF_70">#B3FFFFFF</color>
+    <color name="color_FFFFFF_50">#80FFFFFF</color>
+    <color name="color_FFFFFF_40">#66FFFFFF</color>
+    <color name="color_FFFFFF_20">#32FFFFFF</color>
+    <color name="color_FFFFFF_15">#26FFFFFF</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="color_FF000000">#FF000000</color>
+    <color name="color_000000_90">#E6000000</color>
+    <color name="color_000000_80">#CC000000</color>
+    <color name="color_000000_70">#B3000000</color>
+    <color name="color_000000_60">#99000000</color>
+    <color name="color_000000_40">#66000000</color>
+    <color name="color_000000_30">#48000000</color>
+    <color name="color_000000_20">#32000000</color>
+    <color name="color_000000_15">#26000000</color>
+
+    <color name="color_000000_80F">#80000000</color>
+    <color name="color_000000_8A">#8A000000</color>
+    <color name="color_000000_94">#94000000</color>
+    <color name="color_000000_9E">#9E000000</color>
+    <color name="color_000000_A8">#A8000000</color>
+    <color name="color_000000_B2">#B2000000</color>
+    <color name="color_000000_BC">#BC000000</color>
+    <color name="color_000000_C6">#C6000000</color>
+    <color name="color_000000_FF">#FF000000</color>
+
+    <!-- Unused Subtitle Text -->
+    <color name="color_FFB6C1">#FFB6C1</color>
+    <color name="color_6CFFFFFF">#6CFFFFFF</color>
+    <color name="color_CCFFFFFF">#CCFFFFFF</color>
+
+
+    <color name="subtitle_text_color_1">#FFFFFF</color>
+    <color name="subtitle_text_color_2">#E5E5E5</color>
+    <color name="subtitle_text_color_3">#CCCCCC</color>
+    <color name="subtitle_text_color_4">#B2B2B2</color>
+    <color name="subtitle_text_color_5">#999999</color>
+    <color name="subtitle_text_color_6">#7F7F7F</color>
+    <color name="subtitle_text_color_7">#666666</color>
+    <color name="subtitle_text_color_8">#4C4C4C</color>
+    <color name="subtitle_text_color_9">#333333</color>
+
+
+    <!-- 定义颜色数组 -->
+    <array name="subtitle_text_color">
+        <item>@color/subtitle_text_color_1</item>
+        <item>@color/subtitle_text_color_2</item>
+        <item>@color/subtitle_text_color_3</item>
+        <item>@color/subtitle_text_color_4</item>
+        <item>@color/subtitle_text_color_5</item>
+        <item>@color/subtitle_text_color_6</item>
+        <item>@color/subtitle_text_color_7</item>
+        <item>@color/subtitle_text_color_8</item>
+        <item>@color/subtitle_text_color_9</item>
+        <item>@color/color_FFB6C1</item>
+
+    </array>
+    <array name="subtitle_text_shadow_color">
+        <item>@color/color_000000_80F</item>
+        <item>@color/color_000000_8A</item>
+        <item>@color/color_000000_94</item>
+        <item>@color/color_000000_9E</item>
+        <item>@color/color_000000_A8</item>
+        <item>@color/color_000000_B2</item>
+        <item>@color/color_000000_BC</item>
+        <item>@color/color_000000_C6</item>
+        <item>@color/color_000000_FF</item>
+        <item>@color/color_000000_80F</item>
+
+
+    </array>
+
+    <!-- ===== Summer TV 设计 token（UI 重构阶段 A，取值来自定稿样稿） =====
+         新代码只引用 st_* 语义色；主色继续用主题属性 ?attr/color_theme（随主题切换）。
+         上面以十六进制命名的旧颜色名与实际取值已经对不上，例如：
+           color_32364E 是页面背景（阶段 B 起改为 #0B0E12，与 st_bg 一致），color_3D3D3D 实际是 #1A2027（卡片）。
+         旧名暂时保留，页面在阶段 B/C 重做时逐个改用 st_*，不做一次性全量替换。 -->
+    <color name="st_bg">#0B0E12</color>
+    <color name="st_bg_elevated">#12161C</color>
+    <!-- 叠在模糊背景上的半透明层：7% / 14% 白 -->
+    <color name="st_surface">#12FFFFFF</color>
+    <color name="st_surface_strong">#24FFFFFF</color>
+    <!-- 卡片 1px 内描边：8% 白 -->
+    <color name="st_card_stroke">#2EFFFFFF</color>
+    <color name="st_stroke">#14FFFFFF</color>
+    <color name="st_text_primary">#F5F7FA</color>
+    <color name="st_text_secondary">#A8B0BA</color>
+    <!-- 海报片名未聚焦态：比主文字略暗，但明显亮于副文字 -->
+    <color name="st_text_title_idle">#E4E8ED</color>
+    <color name="st_text_tertiary">#6B7480</color>
+    <!-- 主色填充（焦点按钮、评分角标）上的文字色 -->
+    <color name="st_on_accent">#1A0E07</color>
+    <!-- Hero / 详情背景的渐变遮罩：分别为 82% 与 55% 不透明的 st_bg -->
+    <color name="st_scrim_strong">#D10B0E12</color>
+    <color name="st_scrim_soft">#8C0B0E12</color>
+    <color name="st_scrim_clear">#000B0E12</color>
+    <!-- 角标底色：72% 不透明的 st_bg -->
+    <color name="st_badge_bg">#B80B0E12</color>
+</resources>

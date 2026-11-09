@@ -1,0 +1,8 @@
+#EXTM3U
+# 由 tools/live-check/live_check.py 生成：仅含实测通过的公开免费地址，按耗时排序
+#EXTINF:-1 tvg-name="Arirang" group-title="国际",Arirang
+https://amdlive-ch01-ctnd-com.akamaized.net/arirang_1ch/smil:arirang_1ch.smil/playlist.m3u8$官方源
+#EXTINF:-1 tvg-name="DW" group-title="新闻财经",DW English DE
+https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/index.m3u8$官方源
+#EXTINF:-1 tvg-name="TRT World" group-title="新闻财经",TRT World TR
+https://tv-trtworld.medya.trt.com.tr/master.m3u8$官方源

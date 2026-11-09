@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 直播浮层条目胶囊：聚焦为主题色实心，当前选中（activated）为半透明加强，默认透明 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_pill" />
+            <solid android:color="?attr/color_theme_80" />
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_pill" />
+            <solid android:color="?attr/color_theme_40" />
+        </shape>
+    </item>
+    <item android:state_activated="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_pill" />
+            <solid android:color="@color/st_surface_strong" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_pill" />
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+</selector>

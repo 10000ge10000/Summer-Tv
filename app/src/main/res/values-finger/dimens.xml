@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 触屏设备（手机 / 平板，touchscreen=finger）的字号与控件尺寸。
+     设计稿按 10 英尺电视观看距离定字号，手机屏幕小、离眼近也会显得偏小，这里整体放大约 1.35 倍；
+     电视和盒子（touchscreen=notouch）不受影响，仍使用 values/dimens.xml。 -->
+<resources>
+    <dimen name="st_text_display">72mm</dimen>
+    <dimen name="st_text_display_detail">76mm</dimen>
+    <dimen name="st_text_title">34mm</dimen>
+    <dimen name="st_text_subtitle">29mm</dimen>
+    <dimen name="st_text_tab">27mm</dimen>
+    <dimen name="st_text_body">24mm</dimen>
+    <dimen name="st_text_caption">19mm</dimen>
+    <dimen name="st_text_detail_title">56mm</dimen>
+    <dimen name="st_text_detail_meta">22mm</dimen>
+    <dimen name="st_text_logo">28mm</dimen>
+    <dimen name="st_logo_mark_size">32mm</dimen>
+
+    <dimen name="st_button_height">62mm</dimen>
+    <dimen name="st_button_height_compact">58mm</dimen>
+    <dimen name="st_button_padding_h">28mm</dimen>
+    <dimen name="st_pill_height">52mm</dimen>
+    <dimen name="st_radius_pill">26mm</dimen>
+    <dimen name="st_tab_padding_h">22mm</dimen>
+    <dimen name="st_tab_icon">28mm</dimen>
+
+    <dimen name="st_rail_width">116mm</dimen>
+    <dimen name="st_rail_item_size">88mm</dimen>
+    <dimen name="st_rail_icon">36mm</dimen>
+    <dimen name="st_icon_button_size">52mm</dimen>
+    <dimen name="st_hero_text_max_width">720mm</dimen>
+    <dimen name="st_top_bar_height">64mm</dimen>
+    <dimen name="st_top_bar_offset">84mm</dimen>
+    <dimen name="st_top_scrim_height">160mm</dimen>
+    <dimen name="st_rail_inset">14mm</dimen>
+</resources>
