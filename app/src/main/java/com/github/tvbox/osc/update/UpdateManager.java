@@ -1,48 +1,37 @@
 package com.github.tvbox.osc.update;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
 import android.net.Uri;
-import android.os.Build;
-import android.provider.Settings;
-import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.core.content.FileProvider;
-
 import com.github.tvbox.osc.R;
-import com.github.tvbox.osc.ui.dialog.BaseDialog;
 import com.github.tvbox.osc.ui.dialog.TipDialog;
 import com.github.tvbox.osc.util.LOG;
 
-import java.io.File;
-
 /**
- * 更新流程编排：检查 → 提示 → 下载 → 唤起安装。
+ * 更新流程：检查 → 提示 → 交给浏览器下载。
  *
- * <p>每次进程生命周期内只提示一次，避免用户每回到首页都被打断。
+ * <p>v1.0.20 起应用不再自己下载、安装 APK（不申请 REQUEST_INSTALL_PACKAGES）：
+ * 应用内下载安装是 Play 保护机制等安全扫描判定"恶意下载器"的典型特征。
+ * 发现新版本后只弹窗提示，用户确认后用浏览器打开安装包地址，由用户自己安装。
+ *
+ * <p>每次进程生命周期内只自动提示一次，避免用户每回到首页都被打断。
  */
 public final class UpdateManager {
 
     private static boolean promptedThisSession;
-    /** 等用户在系统设置里允许"安装未知应用"后，回到应用时继续安装的包 */
-    private static File pendingInstall;
+    /** 本进程内是否已经发起过自动检查 */
+    private static boolean autoCheckStarted;
 
     private UpdateManager() {
     }
 
-    /** 本进程内是否已经发起过自动检查（检查 + 静默下载只做一次） */
-    private static boolean autoCheckStarted;
-
-    /**
-     * 进入首页时自动静默检查；发现新版本先在后台下载并校验，完成后再提示安装。
-     * 计费网络（手机流量）下不自动下载，改为先提示、由用户决定是否下载。
-     */
+    /** 进入首页时静默检查，只有发现新版本才提示 */
     public static void checkOnHome(final Activity activity) {
         if (activity == null || activity.isFinishing() || promptedThisSession || autoCheckStarted) return;
+        // 首次使用声明还没同意时不检查，避免更新弹窗和声明弹窗叠在一起；同意后由声明回调再触发
+        if (!com.github.tvbox.osc.ui.dialog.DisclaimerDialog.isAccepted()) return;
         String endpoint = activity.getString(R.string.update_check_url);
         if (endpoint == null || endpoint.trim().isEmpty()) return;
         autoCheckStarted = true;
@@ -50,35 +39,14 @@ public final class UpdateManager {
         UpdateChecker.check(endpoint.trim(), new UpdateChecker.Callback() {
             @Override
             public void onUpdateAvailable(UpdateInfo info) {
-                if (activity.isFinishing()) return;
-                if (isMetered(activity)) {
-                    promptedThisSession = true;
-                    promptUpdate(activity, info);
-                    return;
-                }
-                UpdateChecker.download(activity, info, new UpdateChecker.DownloadCallback() {
-                    @Override
-                    public void onProgress(int percent) {
-                    }
-
-                    @Override
-                    public void onReady(File file) {
-                        if (activity.isFinishing() || promptedThisSession) return;
-                        promptedThisSession = true;
-                        promptInstall(activity, info, file);
-                    }
-
-                    @Override
-                    public void onFailed(String reason) {
-                        // 静默下载失败不打扰用户，下次启动再试；关于页仍可手动检查
-                        LOG.e("Silent update download failed: " + reason);
-                    }
-                });
+                if (activity.isFinishing() || promptedThisSession) return;
+                promptedThisSession = true;
+                promptUpdate(activity, info);
             }
 
             @Override
             public void onNoUpdate() {
-                // 静默：更新检查失败不应打扰用户
+                // 静默：自动检查没有新版本或失败都不打扰用户
             }
         });
     }
@@ -112,67 +80,22 @@ public final class UpdateManager {
         });
     }
 
-    /** 从系统"安装未知应用"设置页返回后调用：已授权就继续安装刚下载好的包 */
-    public static void resumePendingInstall(Activity activity) {
-        if (pendingInstall == null || activity == null || activity.isFinishing()) return;
-        if (!canInstallPackages(activity)) return;
-        File apk = pendingInstall;
-        pendingInstall = null;
-        if (apk.exists()) {
-            launchInstaller(activity, apk);
-        }
-    }
-
-    /** 新版本已在后台下载并通过校验，提示安装 */
-    private static void promptInstall(final Activity activity, final UpdateInfo info, final File apk) {
-        StringBuilder message = new StringBuilder();
-        message.append(activity.getString(R.string.update_ready, info.versionName));
-        if (info.releaseNote != null && !info.releaseNote.trim().isEmpty()) {
-            message.append("\n\n").append(info.releaseNote.trim());
-        }
-        String left = info.forceUpdate ? "退出" : "稍后";
-        TipDialog dialog = new TipDialog(activity, message.toString(), left,
-                activity.getString(R.string.update_install_now),
-                new TipDialog.OnListener() {
-                    @Override
-                    public void left() {
-                        if (info.forceUpdate) {
-                            activity.finish();
-                        }
-                    }
-
-                    @Override
-                    public void right() {
-                        install(activity, apk);
-                    }
-
-                    @Override
-                    public void cancel() {
-                    }
-                });
-        dialog.show();
-    }
-
-    private static boolean isMetered(Context context) {
-        try {
-            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            return cm != null && cm.isActiveNetworkMetered();
-        } catch (Throwable th) {
-            return false;
-        }
-    }
-
     private static void promptUpdate(final Activity activity, final UpdateInfo info) {
         StringBuilder message = new StringBuilder();
-        message.append("发现新版本 ").append(info.versionName);
+        message.append(activity.getString(R.string.update_found, info.versionName));
         if (info.releaseNote != null && !info.releaseNote.trim().isEmpty()) {
             message.append("\n\n").append(info.releaseNote.trim());
         }
+        message.append("\n\n").append(activity.getString(R.string.update_download_hint));
         String left = info.forceUpdate ? "退出" : "稍后";
-        TipDialog dialog = new TipDialog(activity, message.toString(), left, "立即更新",
+        // TipDialog 的按钮不会自己关闭弹窗，需要在回调里 dismiss
+        final TipDialog[] holder = new TipDialog[1];
+        holder[0] = new TipDialog(activity, message.toString(), left,
+                activity.getString(R.string.update_go_download),
                 new TipDialog.OnListener() {
                     @Override
                     public void left() {
+                        holder[0].dismiss();
                         if (info.forceUpdate) {
                             activity.finish();
                         }
@@ -180,137 +103,27 @@ public final class UpdateManager {
 
                     @Override
                     public void right() {
-                        startDownload(activity, info);
+                        holder[0].dismiss();
+                        openDownload(activity, info);
                     }
 
                     @Override
                     public void cancel() {
                     }
                 });
-        dialog.setOnDismissListener(d -> {
-        });
-        dialog.show();
+        holder[0].show();
     }
 
-    private static void startDownload(final Activity activity, UpdateInfo info) {
-        final ProgressDialog progress = new ProgressDialog(activity);
-        progress.show();
-        UpdateChecker.download(activity, info, new UpdateChecker.DownloadCallback() {
-            @Override
-            public void onProgress(int percent) {
-                progress.setPercent(percent);
-            }
-
-            @Override
-            public void onReady(File file) {
-                progress.dismissSafely();
-                install(activity, file);
-            }
-
-            @Override
-            public void onFailed(String reason) {
-                progress.dismissSafely();
-                if (!activity.isFinishing()) {
-                    Toast.makeText(activity, reason == null ? "更新失败" : reason,
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-    }
-
-    /**
-     * Android 8.0 起每个应用都要单独获得"安装未知应用"权限，否则系统或电视厂商的安装器会直接拦截。
-     * 未授权时先说明原因并带用户去授权页，返回后由 {@link #resumePendingInstall} 继续安装。
-     */
-    private static void install(final Activity activity, final File apk) {
-        if (canInstallPackages(activity)) {
-            launchInstaller(activity, apk);
-            return;
-        }
-        pendingInstall = apk;
-        TipDialog dialog = new TipDialog(activity, activity.getString(R.string.update_need_permission),
-                activity.getString(R.string.update_go_settings), activity.getString(R.string.hm_cancel),
-                new TipDialog.OnListener() {
-                    @Override
-                    public void left() {
-                        try {
-                            Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                                    Uri.parse("package:" + activity.getPackageName()));
-                            activity.startActivity(intent);
-                        } catch (Throwable th) {
-                            // 部分电视系统没有这个设置页：直接交给安装器，由安装器自己提示
-                            pendingInstall = null;
-                            launchInstaller(activity, apk);
-                        }
-                    }
-
-                    @Override
-                    public void right() {
-                        pendingInstall = null;
-                    }
-
-                    @Override
-                    public void cancel() {
-                    }
-                });
-        dialog.show();
-    }
-
-    private static boolean canInstallPackages(Context context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return true;
+    /** 用浏览器打开安装包地址；GitHub 地址优先走检查时连通的加速源 */
+    private static void openDownload(Activity activity, UpdateInfo info) {
+        String url = UpdateMirrors.candidates(info.apkUrl).get(0) + info.apkUrl;
         try {
-            return context.getPackageManager().canRequestPackageInstalls();
-        } catch (Throwable th) {
-            return true;
-        }
-    }
-
-    private static void launchInstaller(Context context, File apk) {
-        try {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            Uri uri;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                uri = FileProvider.getUriForFile(
-                        context, context.getPackageName() + ".fileprovider", apk);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            } else {
-                uri = Uri.fromFile(apk);
-            }
-            intent.setDataAndType(uri, "application/vnd.android.package-archive");
-            context.startActivity(intent);
+            activity.startActivity(intent);
         } catch (Throwable th) {
-            LOG.e("Launch installer failed: " + th.getMessage());
-            Toast.makeText(context, "无法唤起安装程序，请手动安装：" + apk.getAbsolutePath(),
-                    Toast.LENGTH_LONG).show();
-        }
-    }
-
-    /** 复用 dialog_tip 布局显示下载进度，隐藏两个按钮，不新增 XML。 */
-    private static final class ProgressDialog extends BaseDialog {
-        private final TextView info;
-
-        ProgressDialog(Context context) {
-            super(context);
-            setContentView(R.layout.dialog_tip);
-            setCanceledOnTouchOutside(false);
-            setCancelable(false);
-            info = findViewById(R.id.tipInfo);
-            findViewById(R.id.leftBtn).setVisibility(View.GONE);
-            findViewById(R.id.rightBtn).setVisibility(View.GONE);
-            info.setText("正在下载更新…");
-        }
-
-        void setPercent(int percent) {
-            info.setText("正在下载更新… " + percent + "%");
-        }
-
-        void dismissSafely() {
-            try {
-                if (isShowing()) dismiss();
-            } catch (Throwable ignored) {
-                // Activity 已销毁时 dismiss 会抛异常，此处无需处理
-            }
+            LOG.e("Open download url failed: " + th.getMessage());
+            Toast.makeText(activity, activity.getString(R.string.update_no_browser, url), Toast.LENGTH_LONG).show();
         }
     }
 }

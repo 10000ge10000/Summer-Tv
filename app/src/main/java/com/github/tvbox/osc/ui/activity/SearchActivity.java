@@ -408,8 +408,11 @@ public class SearchActivity extends BaseActivity {
                         tHotSearchText.setText("热门搜索");
                     }
                 } else if (pos == 0) {
-                    RemoteDialog remoteDialog = new RemoteDialog(mContext);
-                    remoteDialog.show();
+                    // 原"远程搜索"键（需要局域网服务）已移除，改为一键清空
+                    etSearch.setText("");
+                    wordAdapter.setNewData(hots);
+                    mGridViewWord.smoothScrollToPosition(0);
+                    tHotSearchText.setText("热门搜索");
                 }
             }
         });
@@ -616,7 +619,6 @@ public class SearchActivity extends BaseActivity {
     private void initData() {
         showSuccess();
         mGridView.setVisibility(View.GONE);
-        refreshQRCode();
         initCheckedSourcesForSearch();
         initSearchHistory();
         Intent intent = getIntent();

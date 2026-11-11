@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 声明正文区：聚焦时描主色边框，提示可用上下键滚动 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_card_inner" />
+            <solid android:color="@color/st_surface" />
+            <stroke android:width="2mm" android:color="@color/st_accent" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_card_inner" />
+            <solid android:color="@color/st_surface" />
+        </shape>
+    </item>
+</selector>

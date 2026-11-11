@@ -8,7 +8,7 @@
     <string name="commercial_config_pin_backup" translatable="false"></string>
     <string name="update_check_url">https://github.com/10000ge10000/Summer-Tv/releases/latest/download/update.json</string>
     <string name="commercial_config_public_key">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr0uU2okcwvzAj9ysV9kbZSoWYlN4Y0aJQtD8G8D/BD6qIxYVXEO/kbSbySIKbepYRG6vyIJzbPJSZKctGxtu0sBQbwZwPKM9OOj9/yIATCNwtyWsNQ0S2R5KJfYvGuE2d4nHcgFdWUQL7WOnG/LSgyQbyLrsHZMCwq3frGgVSzt4XPpFcZ8nIF6yRZMJi3hyXDXVY79Kqxn3Ngusglp7gXGgkB5kzp13CKJVvTEtq+YTkPpFdn2LoV7F8E2v/+ueDZqXbB1b4MJQYeNy9yxwhtg5ZBUlb91FGVk2hrb19bePGKdbfb8aprbkCOxgNkjcYrHYT4ykH4nULiPwIDAQAB</string>
-    <string name="about_content">Summer TV\n\n基于开源 TVBox 项目改版的 Android TV 播放器定制版。通过旁加载小范围分发，不在应用商店上架。\n\n内容声明：本应用仅提供播放器、播放控制和配置管理能力，不提供影视内容的生产、存储、上传、转码或分发服务。本版本内置了默认配置，其中包含第三方点播站点、解析接口与直播源地址。这些服务由第三方运营，本项目不控制、不背书，也不对其内容与合法性作保证。当前版本固定使用内置配置，应用不提供配置地址入口。\n\n隐私说明：本应用不接入任何第三方广告、统计、支付或推送 SDK，不申请 Advertising ID 权限，不读取通讯录、定位、短信或硬件序列号。\n\n但本应用内置了自行实现的远程配置、广告位与匿名统计能力。统计默认开启，你可以随时在「关于 → 匿名统计」中关闭。关闭后不采集、不入队、不上报，服务端配置无法绕过这一点，关闭时还会立即清空尚未发送的队列。开启时上报的字段仅限：应用版本、渠道、设备类型、播放场景，以及首次运行时随机生成的标识符（不是硬件序列号，卸载重装即重置）。不上传片源地址、配置地址与搜索词原文。\n\n豆瓣接口：首页今日精选与海报墙会请求豆瓣公开接口获取热播榜单、简介和海报，请求不携带账号或设备标识。\n\n应用更新：首页和「关于 → 检查更新」会读取本项目 GitHub Releases 上的版本文件；下载的安装包需通过 SHA-256 与签名证书校验才会安装。\n\n本机数据：配置、播放偏好、历史记录、收藏与缓存保存在本机；为把能播的源排在前面，应用会在本机记录各站点与线路的起播成败和耗时，仅保存在本机、不上传；崩溃日志保存在应用私有目录，仅供本地排查，不会自动上传。\n\n开源说明：本项目基于 CatVodTVOfficial/TVBoxOSC 与 takagen99/Box，以 AGPL-3.0 发布。获得本安装包的接收者有权获取对应的完整源码。详见 LICENSE 与 NOTICE.md。</string>
+    <string name="about_content">Summer TV\n\n基于开源 TVBox 项目改版的 Android TV 播放器定制版。通过旁加载小范围分发，不在应用商店上架。\n\n内容声明：本应用仅提供播放器、播放控制和配置管理能力，不提供影视内容的生产、存储、上传、转码或分发服务。本版本内置了默认配置，其中包含第三方点播站点、解析接口与直播源地址。这些服务由第三方运营，本项目不控制、不背书，也不对其内容与合法性作保证。当前版本固定使用内置配置，应用不提供配置地址入口。\n\n隐私说明：本应用不接入任何第三方广告、统计、支付或推送 SDK，不申请 Advertising ID 权限，不读取通讯录、定位、短信或硬件序列号。\n\n但本应用内置了自行实现的远程配置、广告位与匿名统计能力。统计默认开启，你可以随时在「关于 → 匿名统计」中关闭。关闭后不采集、不入队、不上报，服务端配置无法绕过这一点，关闭时还会立即清空尚未发送的队列。开启时上报的字段仅限：应用版本、渠道、设备类型、播放场景，以及首次运行时随机生成的标识符（不是硬件序列号，卸载重装即重置）。不上传片源地址、配置地址与搜索词原文。\n\n豆瓣接口：首页今日精选与海报墙会请求豆瓣公开接口获取热播榜单、简介和海报，请求不携带账号或设备标识。\n\n应用更新：首页和「关于 → 检查更新」会读取本项目 GitHub Releases（及其加速镜像）上的版本文件；发现新版本只提示，由你用浏览器下载后自行安装，应用不会自己下载或安装安装包。\n\n本机数据：配置、播放偏好、历史记录、收藏与缓存保存在本机；为把能播的源排在前面，应用会在本机记录各站点与线路的起播成败和耗时，仅保存在本机、不上传；崩溃日志保存在应用私有目录，仅供本地排查，不会自动上传。\n\n开源说明：本项目基于 CatVodTVOfficial/TVBoxOSC 与 takagen99/Box，以 AGPL-3.0 发布。获得本安装包的接收者有权获取对应的完整源码。详见 LICENSE 与 NOTICE.md。</string>
     <string name="about_version">版本：v%1$s</string>
 
     // Home Page //
@@ -151,7 +151,7 @@
     <string name="act_search">搜索</string>
     <string name="act_search_clr">清空</string>
     <string name="act_search_del">删除</string>
-    <string name="act_search_rem">远程搜索</string>
+    <string name="act_search_rem">清空</string>
     <string name="act_search_trend">热门搜索</string>
     <string name="act_search_txt">请输入要搜索的内容</string>
     <string name="act_settings">Summer TV 设置</string>

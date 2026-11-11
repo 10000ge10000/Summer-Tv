@@ -7,7 +7,7 @@ import java.util.List;
  * 国内网络常连不上 GitHub：先直连，失败再依次走免费加速镜像（格式均为 前缀 + 原 GitHub 地址）。
  *
  * <p>2026-11-09 实测可用，均支持 releases/latest/download 跳转；镜像失效时删掉或替换即可。
- * 镜像可能篡改内容，但安装前会比对签名证书，篡改的包无法通过（SHA-256 与包同源，只防传输损坏）。
+ * 镜像可能篡改内容；但签名不同的包无法覆盖安装已装的应用，篡改包装不上。
  */
 final class UpdateMirrors {
 

@@ -158,8 +158,8 @@ public class HomeActivity extends BaseActivity {
         startSplash();
 
         EventBus.getDefault().register(this);
+        // 本地代理服务只监听 127.0.0.1，供片源代理 / m3u8 去广告等内部使用，局域网设备连不进来
         ControlManager.get().startServer();
-        App.startWebserver();
         initView();
         initViewModel();
         useCacheConfig = false;
@@ -836,7 +836,6 @@ public class HomeActivity extends BaseActivity {
             View ad = contentLayout.findViewWithTag("commercial_ad_" + AdPlacement.HOME_TOP_BANNER.name());
             if (ad != null) ad.setVisibility(View.GONE);
         }
-        UpdateManager.resumePendingInstall(this);
         UpdateManager.checkOnHome(this);
     }
 
@@ -1045,6 +1044,7 @@ public class HomeActivity extends BaseActivity {
         if (splashOverlay == null) return;
         if (splashPlayed) {
             splashOverlay.setVisibility(View.GONE);
+            splashOverlay.post(this::showDisclaimerIfNeeded);
             return;
         }
         splashPlayed = true;
@@ -1080,7 +1080,14 @@ public class HomeActivity extends BaseActivity {
             splashOverlay.setVisibility(View.GONE);
             // 遥控器设备：开屏结束后把焦点交给今日精选
             if (getCurrentFocus() == null) focusContent();
+            showDisclaimerIfNeeded();
         }).start();
+    }
+
+    /** 首次使用先弹使用声明；同意后再做被它挡住的自动更新检查 */
+    private void showDisclaimerIfNeeded() {
+        com.github.tvbox.osc.ui.dialog.DisclaimerDialog.showIfNeeded(this,
+                () -> UpdateManager.checkOnHome(this));
     }
 
     /** @return 实际生效的收起程度（焦点在顶栏时会被强制为 0） */

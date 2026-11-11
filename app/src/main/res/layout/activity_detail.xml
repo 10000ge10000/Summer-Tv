@@ -256,6 +256,7 @@
 
                     <TextView
                         android:id="@+id/tvPush"
+                        android:visibility="gone"
                         android:layout_width="wrap_content"
                         android:layout_height="@dimen/st_button_height_compact"
                         android:layout_marginEnd="@dimen/vs_12"

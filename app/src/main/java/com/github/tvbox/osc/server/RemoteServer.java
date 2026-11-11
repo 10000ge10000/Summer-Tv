@@ -69,7 +69,8 @@ public class RemoteServer extends NanoHTTPD {
     public static String artist;
 
     public RemoteServer(int port, Context context) {
-        super(port);
+        // 只绑定本机回环地址：v1.0.20 起去掉手机推送 / 远程搜索，局域网与外部设备无法访问这个服务
+        super("127.0.0.1", port);
         mContext = context;
         addGetRequestProcess();
         addPostRequestProcess();

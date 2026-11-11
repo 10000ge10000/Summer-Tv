@@ -27,6 +27,11 @@ public class AboutActivity extends BaseActivity {
         version.setText(getString(R.string.about_version, BuildConfig.VERSION_NAME));
         findViewById(R.id.aboutScroll).requestFocus();
 
+        findViewById(R.id.aboutDisclaimer).setOnClickListener(v -> {
+            FastClickCheckUtil.check(v);
+            com.github.tvbox.osc.ui.dialog.DisclaimerDialog.showReadOnly(this);
+        });
+
         findViewById(R.id.aboutUpdate).setOnClickListener(v -> {
             FastClickCheckUtil.check(v);
             com.github.tvbox.osc.update.UpdateManager.checkManually(this);
@@ -66,13 +71,6 @@ public class AboutActivity extends BaseActivity {
                     });
             holder[0].show();
         });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // 从系统"安装未知应用"授权页返回后继续安装更新
-        com.github.tvbox.osc.update.UpdateManager.resumePendingInstall(this);
     }
 
     private void updateAnalyticsText(TextView view) {

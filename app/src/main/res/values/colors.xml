@@ -112,6 +112,8 @@
            color_32364E 是页面背景（阶段 B 起改为 #0B0E12，与 st_bg 一致），color_3D3D3D 实际是 #1A2027（卡片）。
          旧名暂时保留，页面在阶段 B/C 重做时逐个改用 st_*，不做一次性全量替换。 -->
     <color name="st_bg">#0B0E12</color>
+    <!-- 主色（与默认"夏日"主题 color_theme 相同）；弹窗等不继承应用主题的地方直接引用 -->
+    <color name="st_accent">#FF8A50</color>
     <color name="st_bg_elevated">#12161C</color>
     <!-- 叠在模糊背景上的半透明层：7% / 14% 白 -->
     <color name="st_surface">#12FFFFFF</color>

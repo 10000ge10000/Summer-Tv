@@ -1,14 +1,13 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'com.yanzhenjie.andserver'
 
 def static buildTime() {
     return new Date().format("yyyyMMdd_HHmm", TimeZone.getTimeZone("GMT+08:00"))
 }
 
-def appVersionCode = 19
-def appVersionName = "1.0.19"
+def appVersionCode = 20
+def appVersionName = "1.0.20"
 def releaseStoreFilePath = (findProperty("YIWANTV_RELEASE_STORE_FILE") ?: System.getenv("YIWANTV_RELEASE_STORE_FILE")) as String
 def releaseStorePassword = (findProperty("YIWANTV_RELEASE_STORE_PASSWORD") ?: System.getenv("YIWANTV_RELEASE_STORE_PASSWORD")) as String
 def releaseKeyAlias = (findProperty("YIWANTV_RELEASE_KEY_ALIAS") ?: System.getenv("YIWANTV_RELEASE_KEY_ALIAS")) as String
@@ -235,8 +234,6 @@ dependencies {
     implementation 'org.conscrypt:conscrypt-android:2.5.2'
     implementation 'io.github.inflationx:viewpump:2.1.1'
     implementation 'io.github.inflationx:calligraphy3:3.1.1'
-    implementation 'com.yanzhenjie.andserver:api:2.1.12'
-    kapt 'com.yanzhenjie.andserver:processor:2.1.12'
     implementation 'com.github.ctiao:DanmakuFlameMaster:0.9.25'
     implementation('org.simpleframework:simple-xml:2.7.1') {
         exclude group: 'stax', module: 'stax-api'
