@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LOG;
+import com.github.tvbox.osc.util.PlaybackCompatProfile;
 import com.github.tvbox.osc.util.PlayerHelper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -51,7 +52,7 @@ public class LivePlayerManager {
             int playerType = sanitizePlayerType(Hawk.get(HawkConfig.LIVE_PLAYER_TYPE, PLAYER_SYSTEM));
             defaultPlayerConfig.put("pl", playerType);
             defaultPlayerConfig.put("ijk", "软解码");
-            defaultPlayerConfig.put("pr", Hawk.get(HawkConfig.PLAY_RENDER, 0));
+            defaultPlayerConfig.put("pr", Hawk.get(HawkConfig.PLAY_RENDER, PlaybackCompatProfile.RENDER_SURFACE));
             defaultPlayerConfig.put("sc", Hawk.get(HawkConfig.PLAY_SCALE, 0));
         } catch (JSONException e) {
             e.printStackTrace();

@@ -21,4 +21,21 @@
     <string name="about_analytics">Anonymous analytics: %1$s</string>
     <string name="about_analytics_note">On by default. Only app version, channel, device type, playback scene and a random install ID are sent; no source URLs or search terms. You can turn it off at any time.</string>
     <string name="about_scroll_hint">Use Up / Down to scroll</string>
+    <string name="act_search_history">Search History</string>
+    <string name="det_empty_playlist">No playable episodes</string>
+    <string name="det_empty_playlist_hint">Try Quick Search above to find another source</string>
+    <string name="det_desc_title">Synopsis</string>
+    <string name="play_loading">Loading…</string>
+    <string name="dia_yes">Confirm</string>
+    <string name="dia_no">Cancel</string>
+    <string name="act_del_done">Done</string>
+    <string name="smart_resolving">Searching sources…</string>
+    <string name="smart_probing">Verifying playable streams…</string>
+    <string name="smart_cancel_hint">Press Back to cancel · Long press poster to pick manually</string>
+    <string name="fs_filter_playable">Playable only</string>
+    <string name="fs_filter_all">All sources</string>
+    <string name="fs_results_playable">Playable: %1$d</string>
+    <string name="fs_results_probing">Playable: %1$d (checking…)</string>
+    <string name="fs_results_all">All results: %1$d</string>
+    <string name="fs_no_playable_tip">No direct playable stream verified; switched to all sources</string>
 </resources>

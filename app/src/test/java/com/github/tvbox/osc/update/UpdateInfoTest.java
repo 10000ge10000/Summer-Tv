@@ -18,9 +18,18 @@ public class UpdateInfoTest {
             + "\"versionCode\":19,\"versionName\":\"1.0.19\",\"forceUpdate\":false,"
             + "\"releaseNote\":\"修复若干问题\","
             + "\"apks\":{"
+            + "\"universalGenericNormal\":{\"url\":\"https://github.com/x/y/releases/download/v1.0.19/u.apk\",\"sha256\":\"" + SHA_A + "\"},"
             + "\"arm64GenericNormal\":{\"url\":\"https://github.com/x/y/releases/download/v1.0.19/a.apk\",\"sha256\":\"" + SHA_A + "\"},"
             + "\"armeabiGenericNormal\":{\"url\":\"https://github.com/x/y/releases/download/v1.0.19/b.apk\",\"sha256\":\"" + SHA_B + "\"}"
             + "}}";
+
+    @Test
+    public void selectsUniversalAssetForUniversalFlavor() {
+        UpdateInfo info = new Gson().fromJson(JSON, UpdateInfo.class);
+        info.selectVariant("universalGenericNormal");
+        assertTrue(info.isValid());
+        assertTrue(info.apkUrl.endsWith("/u.apk"));
+    }
 
     @Test
     public void selectsAssetForCurrentFlavor() {

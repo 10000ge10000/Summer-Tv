@@ -1,5 +1,6 @@
 package com.github.tvbox.osc.ui.activity;
 
+import android.view.View;
 import android.widget.TextView;
 
 import com.github.tvbox.osc.BuildConfig;
@@ -7,6 +8,7 @@ import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.base.BaseActivity;
 import com.github.tvbox.osc.commercial.MonetizationManager;
 import com.github.tvbox.osc.ui.dialog.TipDialog;
+import com.github.tvbox.osc.ui.tv.Motion;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 
 /**
@@ -27,17 +29,27 @@ public class AboutActivity extends BaseActivity {
         version.setText(getString(R.string.about_version, BuildConfig.VERSION_NAME));
         findViewById(R.id.aboutScroll).requestFocus();
 
-        findViewById(R.id.aboutDisclaimer).setOnClickListener(v -> {
+        View disclaimerBtn = findViewById(R.id.aboutDisclaimer);
+        View updateBtn = findViewById(R.id.aboutUpdate);
+        TextView analytics = findViewById(R.id.aboutAnalytics);
+        View.OnFocusChangeListener buttonFocus = (v, hasFocus) -> {
+            if (hasFocus) Motion.focusButton(v);
+            else Motion.unfocus(v);
+        };
+        disclaimerBtn.setOnFocusChangeListener(buttonFocus);
+        updateBtn.setOnFocusChangeListener(buttonFocus);
+        analytics.setOnFocusChangeListener(buttonFocus);
+
+        disclaimerBtn.setOnClickListener(v -> {
             FastClickCheckUtil.check(v);
             com.github.tvbox.osc.ui.dialog.DisclaimerDialog.showReadOnly(this);
         });
 
-        findViewById(R.id.aboutUpdate).setOnClickListener(v -> {
+        updateBtn.setOnClickListener(v -> {
             FastClickCheckUtil.check(v);
             com.github.tvbox.osc.update.UpdateManager.checkManually(this);
         });
 
-        TextView analytics = findViewById(R.id.aboutAnalytics);
         updateAnalyticsText(analytics);
         analytics.setOnClickListener(v -> {
             FastClickCheckUtil.check(v);

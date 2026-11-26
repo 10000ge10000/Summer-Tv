@@ -153,10 +153,22 @@
 -keep class * implements com.google.gson.TypeAdapterFactory
 -keep class * implements com.google.gson.JsonSerializer
 -keep class * implements com.google.gson.JsonDeserializer
+# 禁止 R8 对 Gson TypeToken 匿名子类做水平类合并或裁剪泛型签名
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken { *; }
 # Prevent R8 from leaving Data object members always null
 -keepclassmembers,allowobfuscation class * {
   @com.google.gson.annotations.SerializedName <fields>;
 }
+# 经 Gson 序列化/反序列化的模型类与内部类保留原名与字段
+-keep class com.github.tvbox.osc.bean.AbsSortJson { *; }
+-keep class com.github.tvbox.osc.bean.AbsSortJson$* { *; }
+-keep class com.github.tvbox.osc.bean.AbsJson { *; }
+-keep class com.github.tvbox.osc.bean.AbsJson$* { *; }
+-keep class com.github.tvbox.osc.bean.Doh { *; }
+-keep class com.github.tvbox.osc.util.SiteQualityStore$Stat { *; }
+-keep class com.github.tvbox.osc.util.js.Req { *; }
+-keep class com.github.tvbox.osc.util.js.Res { *; }
 # 应用内更新的响应模型经 Gson 反序列化，类与无参构造必须保留
 -keep class com.github.tvbox.osc.update.UpdateInfo { *; }
 -keep class com.github.tvbox.osc.update.UpdateInfo$Asset { *; }

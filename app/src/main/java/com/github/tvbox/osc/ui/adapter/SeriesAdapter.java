@@ -1,5 +1,6 @@
 package com.github.tvbox.osc.ui.adapter;
 
+import android.content.res.ColorStateList;
 import androidx.core.content.ContextCompat;
 import android.widget.TextView;
 
@@ -25,9 +26,16 @@ public class SeriesAdapter extends BaseQuickAdapter<VodInfo.VodSeries, BaseViewH
     protected void convert(BaseViewHolder helper, VodInfo.VodSeries item) {
         TextView tvSeries = helper.getView(R.id.tvSeries);
         if (item.selected) {
-            // takagen99: Added Theme Color
-//            tvSeries.setTextColor(mContext.getResources().getColor(R.color.color_theme));
-            tvSeries.setTextColor(((BaseActivity) mContext).getThemeColor());
+            int focusedColor = ContextCompat.getColor(mContext, R.color.st_bg);
+            int selectedColor = ((BaseActivity) mContext).getThemeColor();
+            ColorStateList stateList = new ColorStateList(
+                    new int[][]{
+                            new int[]{android.R.attr.state_focused},
+                            new int[]{}
+                    },
+                    new int[]{focusedColor, selectedColor}
+            );
+            tvSeries.setTextColor(stateList);
         } else {
             // 随焦点切换：聚焦时浅色底配深色字，其余白字
             tvSeries.setTextColor(ContextCompat.getColorStateList(mContext, R.color.st_button_text));

@@ -52,14 +52,23 @@
             android:paddingRight="@dimen/vs_50"
             android:paddingBottom="@dimen/vs_10">
 
-            <ImageView
-                android:id="@+id/ivThumb"
+            <com.github.tvbox.osc.ui.tv.widget.RoundClipFrameLayout
+                android:id="@+id/ivThumbFrame"
                 android:layout_width="@dimen/st_detail_poster_width"
                 android:layout_height="@dimen/st_detail_poster_height"
-                android:clickable="true"
+                android:background="@drawable/st_card_frame_bg"
                 android:elevation="@dimen/vs_8"
                 android:focusable="false"
-                android:scaleType="fitXY" />
+                android:foreground="@drawable/st_card_stroke">
+
+                <ImageView
+                    android:id="@+id/ivThumb"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clickable="true"
+                    android:focusable="false"
+                    android:scaleType="centerCrop" />
+            </com.github.tvbox.osc.ui.tv.widget.RoundClipFrameLayout>
 
             <View
                 android:id="@+id/previewPlayerPlace"
@@ -214,7 +223,7 @@
                         android:paddingRight="@dimen/st_button_padding_h"
                         android:singleLine="true"
                         android:text="@string/det_play"
-                        android:textColor="@color/st_button_text"
+                        android:textColor="@color/st_button_primary_text"
                         android:textSize="@dimen/st_text_tab"
                         android:textStyle="bold" />
 
@@ -328,27 +337,29 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal"
+            android:gravity="center"
+            android:orientation="vertical"
             tools:visibility="gone">
 
             <ImageView
-                android:layout_width="@dimen/vs_128"
-                android:layout_height="@dimen/vs_128"
-                android:layout_gravity="center"
-                android:alpha="0.6"
+                android:layout_width="@dimen/vs_100"
+                android:layout_height="@dimen/vs_100"
+                android:alpha="0.5"
                 android:src="@drawable/icon_empty" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="@dimen/vs_10"
-                android:layout_marginLeft="@dimen/vs_10"
-                android:gravity="center"
-                android:text="暂无播放数据"
-                android:textColor="@color/st_text_secondary"
-                android:textSize="@dimen/ts_24" />
+                android:layout_marginTop="@dimen/vs_15"
+                android:text="@string/det_empty_playlist"
+                android:textAppearance="@style/TextAppearance.Summer.Title" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vs_8"
+                android:text="@string/det_empty_playlist_hint"
+                android:textAppearance="@style/TextAppearance.Summer.Body" />
         </LinearLayout>
 
         <com.owen.tvrecyclerview.widget.TvRecyclerView

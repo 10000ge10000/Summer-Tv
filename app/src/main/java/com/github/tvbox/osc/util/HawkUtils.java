@@ -108,7 +108,7 @@ public class HawkUtils {
      * @return int
      */
     public static int getExoRenderer() {
-        return Hawk.get(HawkConfig.EXO_RENDERER, 0);
+        return Hawk.get(HawkConfig.EXO_RENDERER, 1);
     }
 
     public static void nextExoRenderer() {
@@ -154,7 +154,7 @@ public class HawkUtils {
      * @return int
      */
     public static int getExoRendererMode() {
-        return Hawk.get(HawkConfig.EXO_RENDERER_MODE, 1);
+        return Hawk.get(HawkConfig.EXO_RENDERER_MODE, 0);
     }
 
     public static void nextExoRendererMode() {

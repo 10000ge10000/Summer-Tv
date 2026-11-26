@@ -197,8 +197,9 @@ public class HomeActivity extends BaseActivity {
         this.posterFocus.attach();
         this.sortAdapter = new SortAdapter();
         this.mGridView.setLayoutManager(new V7LinearLayoutManager(this.mContext, 0, false));
-        // 分类标签相对整屏居中：右侧补一块与左侧标志区（标志 + 字标）等宽的留白
-        tvName.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
+        // 分类标签相对整屏居中：右侧补一块与左侧标志区（标志 + 字标胶囊）等宽的留白
+        View brandEntry = findViewById(R.id.brandEntry);
+        brandEntry.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
             View balance = findViewById(R.id.topBarBalance);
             ViewGroup bar = (ViewGroup) v.getParent();
             ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
@@ -208,6 +209,10 @@ public class HomeActivity extends BaseActivity {
                 lp.width = width;
                 balance.post(() -> balance.setLayoutParams(lp));
             }
+        });
+        brandEntry.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) Motion.focus(v, Motion.SCALE_TAB);
+            else Motion.unfocus(v);
         });
         this.mGridView.setSpacingWithMargins(0, AutoSizeUtils.dp2px(this.mContext, 10.0f));
         this.mGridView.setAdapter(this.sortAdapter);
@@ -306,15 +311,14 @@ public class HomeActivity extends BaseActivity {
                 return grid.focusSubCategoryOrGrid();
             }
         });
-        // 点 Summer TV 标志 / 字标：打开关于页（第三轮：右上角关于角标移除后的入口）
+        // 点 Summer TV 品牌胶囊：打开关于页（第三轮：右上角关于角标移除后的入口）
         View.OnClickListener openAbout = v -> {
             FastClickCheckUtil.check(v);
             jumpActivity(AboutActivity.class);
         };
-        tvName.setOnClickListener(openAbout);
-        findViewById(R.id.stLogoMark).setOnClickListener(openAbout);
-        // 长按字标：清理缓存并重新加载首页（原单击行为）
-        tvName.setOnLongClickListener(new View.OnLongClickListener() {
+        brandEntry.setOnClickListener(openAbout);
+        // 长按品牌胶囊：清理缓存并重新加载首页（原单击行为）
+        brandEntry.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 File dir = getCacheDir();

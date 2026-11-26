@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 详情页小窗预览聚焦边框 -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_focused="true">
-        <shape>
-            <stroke android:width="2mm" android:color="@android:color/white" />
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_card" />
+            <stroke android:width="@dimen/st_focus_stroke" android:color="?attr/color_theme" />
         </shape>
     </item>
-    <item android:state_focused="false">
-        <shape>
-            <solid android:color="@android:color/transparent"/>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_card" />
+            <stroke android:width="1mm" android:color="@color/st_stroke" />
+            <solid android:color="@android:color/transparent" />
         </shape>
     </item>
 </selector>

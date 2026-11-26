@@ -54,9 +54,13 @@ import com.github.tvbox.osc.ui.tv.widget.CustomEditText;
 import com.github.tvbox.osc.ui.tv.widget.SearchKeyboard;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.util.HawkConfig;
+import com.github.tvbox.osc.util.PlayableStreamFilter;
 import com.github.tvbox.osc.util.SearchHelper;
 import com.github.tvbox.osc.util.SearchResultMerger;
 import com.github.tvbox.osc.util.SettingsUtil;
+import com.github.tvbox.osc.util.SiteQualityStore;
+import com.github.tvbox.osc.util.SmartSourceResolver;
+import com.github.tvbox.osc.util.SourceRanker;
 import com.github.tvbox.osc.viewmodel.SourceViewModel;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -99,6 +103,10 @@ public class SearchActivity extends BaseActivity {
     private CustomEditText etSearch;
     private TextView tvSearch;
     private TextView tvClear;
+    private View searchResultBar;
+    private TextView tvSearchResultTitle;
+    private TextView btnPlayableFilter;
+    private PlayableStreamFilter streamFilter;
     private SearchKeyboard keyboard;
     private TextView tvAddress;
     private ImageView ivQRCode;
@@ -208,6 +216,49 @@ public class SearchActivity extends BaseActivity {
         tv_history = findViewById(R.id.tv_history);
         clearHistory = findViewById(R.id.clear_history);
         tvClear = findViewById(R.id.tvClear);
+        searchResultBar = findViewById(R.id.searchResultBar);
+        tvSearchResultTitle = findViewById(R.id.tvSearchResultTitle);
+        btnPlayableFilter = findViewById(R.id.btnPlayableFilter);
+        streamFilter = new PlayableStreamFilter(new PlayableStreamFilter.Callback() {
+            @Override
+            public void onVerifiedPlayable(Movie.Video video) {
+                if (!streamFilter.isPlayableOnly() || isFinishing()) return;
+                List<Movie.Video> single = new ArrayList<>(1);
+                single.add(video);
+                if (SearchResultMerger.merge(searchAdapter, mGridView, single, searchTitle, siteElapsed)) {
+                    showSearchResultsPane();
+                }
+            }
+
+            @Override
+            public void onProgressChanged(int playableCount, int totalCount, boolean probing) {
+                updateSearchFilterHeader(playableCount, totalCount, probing);
+            }
+
+            @Override
+            public void onAllFinished(int playableCount, int totalCount) {
+                if (isFinishing()) return;
+                if (streamFilter.isPlayableOnly() && playableCount == 0 && totalCount > 0) {
+                    streamFilter.setPlayableOnly(false);
+                    updateSearchFilterButton();
+                    rebuildSearchList();
+                    Toast.makeText(SearchActivity.this, R.string.fs_no_playable_tip, Toast.LENGTH_SHORT).show();
+                } else if (searchAdapter.getData().isEmpty()) {
+                    showEmpty();
+                }
+            }
+        });
+        updateSearchFilterButton();
+        btnPlayableFilter.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) Motion.focusButton(v);
+            else Motion.unfocus(v);
+        });
+        btnPlayableFilter.setOnClickListener(v -> {
+            FastClickCheckUtil.check(v);
+            streamFilter.setPlayableOnly(!streamFilter.isPlayableOnly());
+            updateSearchFilterButton();
+            rebuildSearchList();
+        });
         tvAddress = findViewById(R.id.tvAddress);
         ivQRCode = findViewById(R.id.ivQRCode);
         mGridView = findViewById(R.id.mGridView);
@@ -280,6 +331,14 @@ public class SearchActivity extends BaseActivity {
                     Bundle bundle = new Bundle();
                     bundle.putString("id", video.id);
                     bundle.putString("sourceKey", video.sourceKey);
+                    if (streamFilter != null) {
+                        PlayableStreamFilter.Preloaded pre = streamFilter.getPreloaded(video);
+                        if (pre != null) {
+                            String token = SmartSourceResolver.putPreloadedVod(pre.vodInfo);
+                            if (token != null) bundle.putString(SmartSourceResolver.EXTRA_PRELOADED_TOKEN, token);
+                            if (pre.matchedFlag != null) bundle.putString(SmartSourceResolver.EXTRA_PREFERRED_FLAG, pre.matchedFlag);
+                        }
+                    }
                     SearchResultMerger.putCandidates(bundle, new ArrayList<>(searchAdapter.getData()), video);
                     jumpActivity(DetailActivity.class, bundle);
                 }
@@ -326,6 +385,8 @@ public class SearchActivity extends BaseActivity {
                 keyword = s.toString().trim();
                 if (TextUtils.isEmpty(keyword)) {
                     cancel();
+                    if (streamFilter != null) streamFilter.destroy();
+                    if (searchResultBar != null) searchResultBar.setVisibility(View.GONE);
                     tv_history.setVisibility(View.VISIBLE);
                     searchTips.setVisibility(View.VISIBLE);
                     llWord.setVisibility(View.VISIBLE);
@@ -712,6 +773,49 @@ public class SearchActivity extends BaseActivity {
         mCheckSources = SearchHelper.getSourcesForSearch();
     }
 
+    private void updateSearchFilterButton() {
+        if (btnPlayableFilter == null || streamFilter == null) return;
+        boolean playableOnly = streamFilter.isPlayableOnly();
+        btnPlayableFilter.setActivated(playableOnly);
+        btnPlayableFilter.setText(playableOnly ? R.string.fs_filter_playable : R.string.fs_filter_all);
+    }
+
+    private void updateSearchFilterHeader(int playableCount, int totalCount, boolean probing) {
+        if (tvSearchResultTitle == null || streamFilter == null) return;
+        if (streamFilter.isPlayableOnly()) {
+            tvSearchResultTitle.setText(probing
+                    ? getString(R.string.fs_results_probing, playableCount)
+                    : getString(R.string.fs_results_playable, playableCount));
+        } else {
+            tvSearchResultTitle.setText(getString(R.string.fs_results_all, totalCount));
+        }
+    }
+
+    private void showSearchResultsPane() {
+        showSuccess();
+        tv_history.setVisibility(View.GONE);
+        searchTips.setVisibility(View.GONE);
+        llWord.setVisibility(View.GONE);
+        if (searchResultBar != null) searchResultBar.setVisibility(View.VISIBLE);
+        mGridView.setVisibility(View.VISIBLE);
+    }
+
+    private void rebuildSearchList() {
+        if (streamFilter == null) return;
+        List<Movie.Video> source = streamFilter.isPlayableOnly()
+                ? streamFilter.getVerifiedItems()
+                : streamFilter.getAllItems();
+        List<Movie.Video> ranked = SourceRanker.rank(source, SearchResultMerger.VIDEO_KEYS,
+                searchTitle, SiteQualityStore.quality(), siteElapsed);
+        searchAdapter.setNewData(ranked);
+        if (!ranked.isEmpty()) {
+            showSearchResultsPane();
+        } else if (!streamFilter.isProbing()) {
+            showEmpty();
+        }
+        updateSearchFilterHeader(streamFilter.getPlayableCount(), streamFilter.getTotalCount(), streamFilter.isProbing());
+    }
+
     private void search(String title) {
         cancel();
         showLoading();
@@ -719,7 +823,12 @@ public class SearchActivity extends BaseActivity {
         searchStartAt = SystemClock.elapsedRealtime();
         siteElapsed.clear();
         mGridView.setVisibility(View.GONE);
+        if (searchResultBar != null) searchResultBar.setVisibility(View.VISIBLE);
         searchAdapter.setNewData(new ArrayList<>());
+        if (streamFilter != null) {
+            streamFilter.reset();
+            updateSearchFilterHeader(0, 0, true);
+        }
         refreshSearchHistory(title);
         searchResult();
     }
@@ -793,19 +902,22 @@ public class SearchActivity extends BaseActivity {
                     siteElapsed.put(video.sourceKey, elapsed);
                 }
             }
-            // 按片名匹配度和站点可播性插入，能播的排前面
-            if (SearchResultMerger.merge(searchAdapter, mGridView, data, searchTitle, siteElapsed)) {
-                showSuccess();
-                tv_history.setVisibility(View.GONE);
-                searchTips.setVisibility(View.GONE);
-                llWord.setVisibility(View.GONE);
-                mGridView.setVisibility(View.VISIBLE);
+            if (streamFilter != null) {
+                streamFilter.submit(data, searchTitle);
+            }
+            if (streamFilter == null || !streamFilter.isPlayableOnly()) {
+                if (SearchResultMerger.merge(searchAdapter, mGridView, data, searchTitle, siteElapsed)) {
+                    showSearchResultsPane();
+                }
             }
         }
 
         int count = allRunCount.decrementAndGet();
         if (count <= 0) {
-            if (searchAdapter.getData().size() <= 0) {
+            if (streamFilter != null) {
+                streamFilter.markSearchCompleted();
+            }
+            if (searchAdapter.getData().size() <= 0 && (streamFilter == null || !streamFilter.isProbing())) {
                 showEmpty();
             }
             cancel();
@@ -819,6 +931,9 @@ public class SearchActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (streamFilter != null) {
+            streamFilter.destroy();
+        }
         cancel();
         try {
             if (sourceViewModel != null) {

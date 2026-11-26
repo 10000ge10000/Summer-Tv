@@ -9,6 +9,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import androidx.annotation.NonNull;
+import androidx.media3.common.C;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.PlaybackParameters;
 import androidx.media3.common.Player;
@@ -26,6 +27,7 @@ import androidx.media3.ui.PlayerView;
 import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.HawkUtils;
+import com.github.tvbox.osc.util.PlaybackCompatProfile;
 import com.github.tvbox.osc.util.PlayerHelper;
 import com.orhanobut.hawk.Hawk;
 
@@ -50,7 +52,10 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
     private DefaultRenderersFactory mRenderersFactory;
     private DefaultTrackSelector mTrackSelector;
 
-    private int errorCode = -100;
+    private volatile int errorCode = 0;
+    private volatile String lastErrorMessage = "";
+    private volatile boolean videoFrameRendered = false;
+    private volatile boolean hasVideoTrack = false;
     private String path;
     private Map<String, String> headers;
     private long lastTotalRxBytes = 0;
@@ -59,9 +64,31 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
     private int retriedTimes = 0;
     /** 点播快速起播：缓冲 1 秒即开播（默认 2.5 秒）；直播保持默认，避免频繁卡顿 */
     private boolean fastStart = false;
+    /** 兼容软解模式：优先使用内置 FFmpeg 扩展解码器，规避老芯片硬解花屏或黑屏 */
+    private boolean preferSoftwareDecoder = false;
 
     public void setFastStart(boolean fastStart) {
         this.fastStart = fastStart;
+    }
+
+    public void setPreferSoftwareDecoder(boolean preferSoftwareDecoder) {
+        this.preferSoftwareDecoder = preferSoftwareDecoder;
+    }
+
+    public int getLastErrorCode() {
+        return errorCode;
+    }
+
+    public String getLastErrorMessage() {
+        return lastErrorMessage;
+    }
+
+    public boolean isVideoFrameRendered() {
+        return videoFrameRendered;
+    }
+
+    public boolean hasVideoTrack() {
+        return hasVideoTrack;
     }
 
     public ExoMediaPlayer(Context context) {
@@ -75,8 +102,12 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
         if (mRenderersFactory == null) {
             mRenderersFactory = HawkUtils.createExoRendererActualValue(mAppContext);
         }
-        //https://github.com/androidx/media/blob/release/libraries/decoder_ffmpeg/README.md
-        mRenderersFactory.setExtensionRendererMode(HawkUtils.getExoRendererModeActualValue());
+        // 硬解初始化失败时允许自动回退系统/FFmpeg 软解，避免老电视遇到高规格编码直接黑屏
+        mRenderersFactory.setEnableDecoderFallback(true);
+        int extMode = preferSoftwareDecoder
+                ? DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER
+                : HawkUtils.getExoRendererModeActualValue();
+        mRenderersFactory.setExtensionRendererMode(extMode);
 
         if (mTrackSelector == null) {
             mTrackSelector = new DefaultTrackSelector(mAppContext);
@@ -90,7 +121,8 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
                             DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS).build()
                     : new DefaultLoadControl();
         }
-        mTrackSelector.setParameters(mTrackSelector.getParameters().buildUpon().setPreferredTextLanguage(Locale.getDefault().getISO3Language()).setTunnelingEnabled(true));
+        // 关闭 Tunneling：它与 TextureView 冲突，且大量老旧电视芯片谎报支持导致黑屏卡死
+        mTrackSelector.setParameters(mTrackSelector.getParameters().buildUpon().setPreferredTextLanguage(Locale.getDefault().getISO3Language()).setTunnelingEnabled(false));
         /*mMediaPlayer = new ExoPlayer.Builder(
                 mAppContext,
                 mRenderersFactory,
@@ -158,6 +190,10 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
         if (mSpeedPlaybackParameters != null) {
             mMediaPlayer.setPlaybackParameters(mSpeedPlaybackParameters);
         }
+        videoFrameRendered = false;
+        hasVideoTrack = false;
+        errorCode = 0;
+        lastErrorMessage = "";
         mIsPreparing = true;
         mMediaPlayer.setMediaSource(mMediaSource);
         mMediaPlayer.prepare();
@@ -170,6 +206,8 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
             mMediaPlayer.clearMediaItems();
             mMediaPlayer.setVideoSurface(null);
             mIsPreparing = false;
+            videoFrameRendered = false;
+            hasVideoTrack = false;
         }
     }
 
@@ -300,6 +338,14 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
     public void onTracksChanged(Tracks tracks) {
         if (trackNameProvider == null)
             trackNameProvider = new ExoTrackNameProvider(mAppContext.getResources());
+        if (tracks != null && tracks.containsType(C.TRACK_TYPE_VIDEO)) {
+            hasVideoTrack = true;
+        }
+    }
+
+    @Override
+    public void onRenderedFirstFrame() {
+        videoFrameRendered = true;
     }
 
     @Override
@@ -331,7 +377,16 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
         errorCode = error.errorCode;
-        Log.e("tag--", "" + error.errorCode);
+        String rootMsg = PlayerHelper.getRootCauseMessage(error);
+        lastErrorMessage = rootMsg != null ? rootMsg : String.valueOf(error.getMessage());
+        Log.e("tag--", "Exo error=" + error.errorCode + " msg=" + lastErrorMessage);
+        // 解码/渲染/音轨兼容错误不原地空转重试，立即上抛给 PlayFragment 触发内核降级
+        if (PlaybackCompatProfile.isCompatibilityError(errorCode, lastErrorMessage)) {
+            if (mPlayerEventListener != null) {
+                mPlayerEventListener.onError(error.errorCode, lastErrorMessage);
+            }
+            return;
+        }
         String proxyServer = Hawk.get(HawkConfig.PROXY_SERVER, "");
         if ("".equals(proxyServer)) {
             if (retriedTimes == 0) {
@@ -341,7 +396,7 @@ public class ExoMediaPlayer extends AbstractPlayer implements Player.Listener {
                 start();
             } else {
                 if (mPlayerEventListener != null) {
-                    mPlayerEventListener.onError(error.errorCode, PlayerHelper.getRootCauseMessage(error));
+                    mPlayerEventListener.onError(error.errorCode, lastErrorMessage);
                 }
             }
             return;

@@ -99,7 +99,7 @@
                     android:paddingRight="@dimen/st_button_padding_h"
                     android:singleLine="true"
                     android:text="@string/hm_hero_play"
-                    android:textColor="@color/st_button_text"
+                    android:textColor="@color/st_button_primary_text"
                     android:textSize="@dimen/st_text_tab"
                     android:textStyle="bold" />
             </LinearLayout>

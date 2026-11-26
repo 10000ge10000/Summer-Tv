@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 主题色聚焦按钮（搜索、键盘、热词等）文字色：聚焦在珊瑚橙底上用深色字，默认用主文字色 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/st_on_accent" android:state_focused="true" />
+    <item android:color="@color/st_text_primary" />
+</selector>

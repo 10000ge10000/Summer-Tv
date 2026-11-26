@@ -26,6 +26,7 @@ import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LocaleHelper;
 import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.OkGoHelper;
+import com.github.tvbox.osc.util.PlaybackCompatProfile;
 import com.github.tvbox.osc.util.PlayerHelper;
 import com.github.tvbox.osc.util.SubtitleHelper;
 import com.hjq.permissions.XXPermissions;
@@ -64,6 +65,7 @@ public class App extends MultiDexApplication {
     private static final String REVOKED_LIVE_CACHE_PURGED = "revoked_live_cache_purged";
     private static final String UNAVAILABLE_PLAYER_MIGRATED = "unavailable_player_migrated";
     private static final String SIMPLIFIED_SETTINGS_MIGRATED = "simplified_settings_v3_migrated";
+    private static final String PLAYER_COMPAT_V1_MIGRATED = "player_compat_v1_migrated";
     private static App instance;
     private static P2PClass p;
     public static String burl;
@@ -206,6 +208,7 @@ public class App extends MultiDexApplication {
         // 播放器选项
         putDefault(HawkConfig.SHOW_PREVIEW, false);          //窗口预览: true=开启, false=关闭
         putDefault(HawkConfig.PLAY_SCALE, 0);                //画面缩放: 0=默认, 1=16:9, 2=4:3, 3=填充, 4=原始, 5=裁剪
+        putDefault(HawkConfig.PLAY_RENDER, PlaybackCompatProfile.RENDER_SURFACE); //默认 SurfaceView，兼容老电视硬解直出
         putDefault(HawkConfig.BACKGROUND_PLAY_TYPE, 0);      //后台：0=关闭, 1=开启, 2=画中画
         Hawk.put(HawkConfig.PLAY_TYPE, DEFAULT_VOD_PLAYER_TYPE);              //点播: 0=系统, 1=IJK, 2=Exo
         Hawk.put(HawkConfig.LIVE_PLAYER_TYPE, DEFAULT_LIVE_PLAYER_TYPE);       //直播: 0=系统, 1=IJK, 2=Exo
@@ -228,7 +231,21 @@ public class App extends MultiDexApplication {
 
         migrateUnavailablePlayerType();
         migrateSimplifiedSettings();
+        migratePlayerCompatDefaults();
         purgeRevokedLiveCache();
+    }
+
+    /**
+     * 老旧电视兼容默认值一次性迁移：
+     * 旧版默认 TextureView + 默认 DefaultRenderersFactory（未启用内置 FFmpeg 软解回退），
+     * 迁至 SurfaceView + NextRenderersFactory + EXTENSION_RENDERER_MODE_ON（硬解优先、失败回退软解）。
+     */
+    private void migratePlayerCompatDefaults() {
+        if (Hawk.get(PLAYER_COMPAT_V1_MIGRATED, false)) return;
+        Hawk.put(HawkConfig.PLAY_RENDER, PlaybackCompatProfile.RENDER_SURFACE);
+        Hawk.put(HawkConfig.EXO_RENDERER, 1);
+        Hawk.put(HawkConfig.EXO_RENDERER_MODE, 0);
+        Hawk.put(PLAYER_COMPAT_V1_MIGRATED, true);
     }
 
     /**

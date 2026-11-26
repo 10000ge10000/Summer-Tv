@@ -31,8 +31,8 @@ import java.util.List;
 
 public class CollectActivity extends BaseActivity {
     private TextView tvDelTip;
-    private ImageView tvDelete;
-    private ImageView tvClear;
+    private TextView tvDelete;
+    private TextView tvClear;
     private TvRecyclerView mGridView;
     public static CollectAdapter collectAdapter;
     private boolean delMode = false;
@@ -55,6 +55,7 @@ public class CollectActivity extends BaseActivity {
 
         delMode = !delMode;
         tvDelTip.setVisibility(delMode ? View.VISIBLE : View.GONE);
+        tvDelete.setText(delMode ? R.string.act_del_done : R.string.act_search_del);
 
         // takagen99: Added Theme Color
 //        tvDel.setTextColor(delMode ? getResources().getColor(R.color.color_theme) : Color.WHITE);
@@ -66,6 +67,12 @@ public class CollectActivity extends BaseActivity {
         tvDelTip = findViewById(R.id.tvDelTip);
         tvDelete = findViewById(R.id.tvDelete);
         tvClear = findViewById(R.id.tvClear);
+        View.OnFocusChangeListener pillFocus = (v, hasFocus) -> {
+            if (hasFocus) Motion.focusButton(v);
+            else Motion.unfocus(v);
+        };
+        tvDelete.setOnFocusChangeListener(pillFocus);
+        tvClear.setOnFocusChangeListener(pillFocus);
         mGridView = findViewById(R.id.mGridView);
         mGridView.setHasFixedSize(true);
         mGridView.setLayoutManager(new V7GridLayoutManager(this.mContext, isBaseOnWidth() ? 5 : 6));

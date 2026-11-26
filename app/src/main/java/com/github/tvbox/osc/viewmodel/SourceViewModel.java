@@ -36,7 +36,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.AbsCallback;
 import com.lzy.okgo.model.Response;
@@ -1126,8 +1125,7 @@ public class SourceViewModel extends ViewModel {
     private AbsSortXml sortJson(MutableLiveData<AbsSortXml> result, String json) {
         try {
             JsonObject obj = JsonParser.parseString(json).getAsJsonObject();
-            AbsSortJson sortJson = gson.fromJson(obj, new TypeToken<AbsSortJson>() {
-            }.getType());
+            AbsSortJson sortJson = gson.fromJson(obj, AbsSortJson.class);
             AbsSortXml data = sortJson.toAbsSortXml();
             try {
                 if (obj.has("filters")) {
@@ -1156,6 +1154,7 @@ public class SourceViewModel extends ViewModel {
             }
             return data;
         } catch (Exception e) {
+            LOG.e("sortJson parse failed: " + e);
             return null;
         }
     }
@@ -1272,8 +1271,7 @@ public class SourceViewModel extends ViewModel {
                                                             String res = response.body();
                                                             if (!TextUtils.isEmpty(res)) {
                                                                 try {
-                                                                    AbsJson absJson = gson.fromJson(res, new TypeToken<AbsJson>() {
-                                                                    }.getType());
+                                                                    AbsJson absJson = gson.fromJson(res, AbsJson.class);
                                                                     resData[0] = absJson.toAbsXml();
                                                                     absXml(resData[0], sb.getKey());
                                                                 } catch (Exception e) {
@@ -1298,8 +1296,7 @@ public class SourceViewModel extends ViewModel {
                                                 String res = sp.detailContent(ids);
                                                 if (!TextUtils.isEmpty(res)) {
                                                     try {
-                                                        AbsJson absJson = gson.fromJson(res, new TypeToken<AbsJson>() {
-                                                        }.getType());
+                                                        AbsJson absJson = gson.fromJson(res, AbsJson.class);
                                                         resData[0] = absJson.toAbsXml();
                                                         absXml(resData[0], sb.getKey());
                                                     } catch (Exception e) {
@@ -1475,8 +1472,7 @@ public class SourceViewModel extends ViewModel {
                     "\t\t\"vod_play_url\": \"0$magnet:?xt=urn:btih:9e9358b946c427962533472efdd2efd9e9e38c67&dn=%e9%98%b3%e5%85%89%e7%94%b5%e5%bd%b1www.ygdy8.com.%e7%83%ad%e8%a1%80.2022.BD.1080P.%e9%9f%a9%e8%af%ad%e4%b8%ad%e8%8b%b1%e5%8f%8c%e5%ad%97.mkv&tr=udp%3a%2f%2ftracker.opentrackr.org%3a1337%2fannounce&tr=udp%3a%2f%2fexodus.desync.com%3a6969%2fannounce\"\n" +
                     "\t}]\n" +
                     "}";*/
-            AbsJson absJson = gson.fromJson(json, new TypeToken<AbsJson>() {
-            }.getType());
+            AbsJson absJson = gson.fromJson(json, AbsJson.class);
             AbsXml data = absJson.toAbsXml();
             absXml(data, sourceKey);
             if (searchResult == result) {

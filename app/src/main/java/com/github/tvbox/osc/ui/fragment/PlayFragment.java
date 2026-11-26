@@ -89,6 +89,7 @@ import com.github.tvbox.osc.util.parser.SuperParse;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.github.tvbox.osc.util.PlaybackCompatProfile;
 import com.github.tvbox.osc.util.PlayerHelper;
 import com.github.tvbox.osc.util.LineOrder;
 import com.github.tvbox.osc.util.PlaybackCandidates;
@@ -267,9 +268,12 @@ public class PlayFragment extends BaseLazyFragment {
             public boolean handleMessage(@NonNull Message msg) {
                 if (msg.what == MSG_START_WATCHDOG) {
                     onStartWatchdog();
+                } else if (msg.what == MSG_BLACK_SCREEN_CHECK) {
+                    onBlackScreenCheck();
                 } else if (msg.what == MSG_STABLE_PLAY) {
                     triedFlags.clear();
                     autoRetryCount = 0;
+                    onStablePlayReached();
                 } else if (msg.what == MSG_SITE_TIMEOUT) {
                     onFailoverSiteResult(null, true);
                 } else if (msg.what == 100) {
@@ -383,11 +387,16 @@ public class PlayFragment extends BaseLazyFragment {
             @Override
             public void replay(boolean replay) {
                 autoRetryCount = 0;
+                compatDowngraded = false;
+                triedCompatModes.clear();
                 play(replay);
             }
 
             @Override
             public void errReplay() {
+                if (handlePlaybackCompatError()) {
+                    return;
+                }
                 errorWithRetry("视频播放出错", false);
             }
 
@@ -869,7 +878,14 @@ public class PlayFragment extends BaseLazyFragment {
                     mVideoView.release();
                     if (finalUrl != null) {
                         String url = finalUrl;
-                        videoURL = url;                        
+                        videoURL = url;
+                        if (!url.equals(currentPlayUrl)) {
+                            currentPlayUrl = url;
+                            currentPlayHeaders = headers;
+                            triedCompatModes.clear();
+                            compatDowngraded = false;
+                        }
+                        recordCurrentCompatMode();
                         try {
                             int playerType = mVodPlayerCfg.getInt("pl");
                             // takagen99: Check for External Player
@@ -903,12 +919,14 @@ public class PlayFragment extends BaseLazyFragment {
                             e.printStackTrace();
                         }
                         hideTip();
+                        int curPl = mVodPlayerCfg != null ? mVodPlayerCfg.optInt("pl", PlaybackCompatProfile.PLAYER_EXO_HW) : PlaybackCompatProfile.PLAYER_EXO_HW;
+                        int dashExoPl = (curPl == PlaybackCompatProfile.PLAYER_EXO_SW) ? PlaybackCompatProfile.PLAYER_EXO_SW : PlaybackCompatProfile.PLAYER_EXO_HW;
                         if (url.startsWith("data:application/dash+xml;base64,")) {
-                            PlayerHelper.updateCfg(mVideoView, mVodPlayerCfg, 2, true);
+                            PlayerHelper.updateCfg(mVideoView, mVodPlayerCfg, dashExoPl, true);
                             App.getInstance().setDashData(url.split("base64,")[1]);
                             url = ControlManager.get().getAddress(true) + "dash/proxy.mpd";
                         } else if (url.contains(".mpd") || url.contains("type=mpd")) {
-                            PlayerHelper.updateCfg(mVideoView, mVodPlayerCfg, 2, true);
+                            PlayerHelper.updateCfg(mVideoView, mVodPlayerCfg, dashExoPl, true);
                         } else {
                             PlayerHelper.updateCfg(mVideoView, mVodPlayerCfg, -1, true);
                         }
@@ -1153,22 +1171,18 @@ public class PlayFragment extends BaseLazyFragment {
         }
         try {
             if (!mVodPlayerCfg.has("pl")) {
-                int playType = Hawk.get(HawkConfig.PLAY_TYPE, 0);
+                int playType = Hawk.get(HawkConfig.PLAY_TYPE, PlaybackCompatProfile.PLAYER_EXO_HW);
                 boolean configurationFile = HawkUtils.getVodPlayerPreferredConfigurationFile();
-                int playerType = sourceBean.getPlayerType();
+                int playerType = sourceBean != null ? sourceBean.getPlayerType() : -1;
                 if (configurationFile && playerType != -1) {
                     playType = playerType;
                 }
-                mVodPlayerCfg.put("pl", playType);
+                mVodPlayerCfg.put("pl", PlayerHelper.availablePlayerType(playType));
             } else {
-//                boolean configurationFile = HawkUtils.getVodPlayerPreferredConfigurationFile();
-//                if (!configurationFile) {
-//                    int playType = Hawk.get(HawkConfig.PLAY_TYPE, 0);
-//                    mVodPlayerCfg.put("pl", playType);
-//                }
+                mVodPlayerCfg.put("pl", PlayerHelper.availablePlayerType(mVodPlayerCfg.optInt("pl", PlaybackCompatProfile.PLAYER_EXO_HW)));
             }
             if (!mVodPlayerCfg.has("pr")) {
-                mVodPlayerCfg.put("pr", Hawk.get(HawkConfig.PLAY_RENDER, 0));
+                mVodPlayerCfg.put("pr", PlaybackCompatProfile.normalizeRenderType(Hawk.get(HawkConfig.PLAY_RENDER, PlaybackCompatProfile.RENDER_SURFACE)));
             }
             if (!mVodPlayerCfg.has("ijk")) {
                 mVodPlayerCfg.put("ijk", Hawk.get(HawkConfig.IJK_CODEC, ""));
@@ -1194,10 +1208,10 @@ public class PlayFragment extends BaseLazyFragment {
     void initPlayerDrive() {
         try {
             if (!mVodPlayerCfg.has("pl")) {
-                mVodPlayerCfg.put("pl", Hawk.get(HawkConfig.PLAY_TYPE, 0));
+                mVodPlayerCfg.put("pl", PlayerHelper.availablePlayerType(Hawk.get(HawkConfig.PLAY_TYPE, PlaybackCompatProfile.PLAYER_EXO_HW)));
             }
             if (!mVodPlayerCfg.has("pr")) {
-                mVodPlayerCfg.put("pr", Hawk.get(HawkConfig.PLAY_RENDER, 0));
+                mVodPlayerCfg.put("pr", PlaybackCompatProfile.normalizeRenderType(Hawk.get(HawkConfig.PLAY_RENDER, PlaybackCompatProfile.RENDER_SURFACE)));
             }
             if (!mVodPlayerCfg.has("ijk")) {
                 mVodPlayerCfg.put("ijk", Hawk.get(HawkConfig.IJK_CODEC, ""));
@@ -1278,6 +1292,7 @@ public class PlayFragment extends BaseLazyFragment {
         sourceViewModel.detailResult.removeObserver(mObserverFailoverDetail);
         if (mHandler != null) {
             mHandler.removeMessages(MSG_START_WATCHDOG);
+            mHandler.removeMessages(MSG_BLACK_SCREEN_CHECK);
             mHandler.removeMessages(MSG_SITE_TIMEOUT);
             mHandler.removeMessages(MSG_STABLE_PLAY);
         }
@@ -1395,7 +1410,13 @@ public class PlayFragment extends BaseLazyFragment {
     private static final long STABLE_PLAY_MS = 10 * 1000;
     private static final int MSG_STABLE_PLAY = 700;
     private static final int MSG_START_WATCHDOG = 500;
+    private static final int MSG_BLACK_SCREEN_CHECK = 501;
+    private static final long BLACK_SCREEN_CHECK_MS = 6000L;
     private static final int MSG_SITE_TIMEOUT = 600;
+    private final Set<String> triedCompatModes = new HashSet<>();
+    private boolean compatDowngraded = false;
+    private String currentPlayUrl = null;
+    private HashMap<String, String> currentPlayHeaders = null;
     private final List<PlaybackCandidates.Candidate> siteCandidates = new ArrayList<>();
     private final Set<String> triedFlags = new HashSet<>();
     private int failoverEpisode = -1;
@@ -1412,8 +1433,106 @@ public class PlayFragment extends BaseLazyFragment {
         long cost = SystemClock.elapsedRealtime() - playRequestAt;
         SiteQualityStore.recordSuccess(sourceKey, cost);
         SiteQualityStore.recordSuccess(SiteQualityStore.lineKey(sourceKey, mVodInfo.playFlag), cost);
+        mHandler.removeMessages(MSG_BLACK_SCREEN_CHECK);
+        mHandler.sendEmptyMessageDelayed(MSG_BLACK_SCREEN_CHECK, BLACK_SCREEN_CHECK_MS);
         mHandler.removeMessages(MSG_STABLE_PLAY);
         mHandler.sendEmptyMessageDelayed(MSG_STABLE_PLAY, STABLE_PLAY_MS);
+    }
+
+    private void recordCurrentCompatMode() {
+        if (mVodPlayerCfg == null) return;
+        int pl = mVodPlayerCfg.optInt("pl", PlaybackCompatProfile.PLAYER_EXO_HW);
+        int pr = mVodPlayerCfg.optInt("pr", PlaybackCompatProfile.RENDER_SURFACE);
+        triedCompatModes.add(PlaybackCompatProfile.modeKey(pl, pr));
+    }
+
+    private boolean isDashStream(String url) {
+        if (url == null) return false;
+        return url.startsWith("data:application/dash+xml;base64,") || url.contains(".mpd") || url.contains("type=mpd");
+    }
+
+    /** 解码/渲染/系统播放器异常时先尝试本地内核降级，不误判为片源损坏 */
+    private boolean handlePlaybackCompatError() {
+        if (mVideoView == null || mVodPlayerCfg == null || extPlay || currentPlayUrl == null) return false;
+        AbstractPlayer mp = mVideoView.getMediaPlayer();
+        if (mp instanceof EXOmPlayer) {
+            EXOmPlayer exo = (EXOmPlayer) mp;
+            if (PlaybackCompatProfile.isCompatibilityError(exo.getLastErrorCode(), exo.getLastErrorMessage())) {
+                return tryCompatDowngrade("解码不兼容");
+            }
+            return false;
+        }
+        if (mp instanceof AndroidMediaPlayer) {
+            return tryCompatDowngrade("系统播放器播放失败");
+        }
+        return false;
+    }
+
+    /** 检测到 Exo 已进入播放态且存在视频轨、但 6 秒仍无视频首帧渲染（典型老电视有声黑屏）时自动降级 */
+    private void onBlackScreenCheck() {
+        if (mVideoView == null || !isResumed() || extPlay || currentPlayUrl == null) return;
+        if (!mVideoView.isPlaying()) return;
+        AbstractPlayer mp = mVideoView.getMediaPlayer();
+        if (mp instanceof EXOmPlayer) {
+            EXOmPlayer exo = (EXOmPlayer) mp;
+            if (exo.hasVideoTrack() && !exo.isVideoFrameRendered()) {
+                LOG.e("Black screen detected on Exo (hasVideoTrack=true, rendered=false), downgrading player mode");
+                mHandler.removeMessages(MSG_STABLE_PLAY);
+                firstFrameRecorded = false;
+                tryCompatDowngrade("画面黑屏");
+            }
+        }
+    }
+
+    private boolean tryCompatDowngrade(String reason) {
+        if (mVodPlayerCfg == null || currentPlayUrl == null || extPlay || !isAdded()) return false;
+        int curPl = mVodPlayerCfg.optInt("pl", PlaybackCompatProfile.PLAYER_EXO_HW);
+        int curPr = mVodPlayerCfg.optInt("pr", PlaybackCompatProfile.RENDER_SURFACE);
+        triedCompatModes.add(PlaybackCompatProfile.modeKey(curPl, curPr));
+        boolean allowSystem = !isDashStream(currentPlayUrl);
+        PlaybackCompatProfile.Mode next = PlaybackCompatProfile.nextFallback(curPl, curPr, triedCompatModes, allowSystem);
+        if (next == null) return false;
+        try {
+            mVodPlayerCfg.put("pl", next.playerType);
+            mVodPlayerCfg.put("pr", next.renderType);
+            triedCompatModes.add(next.key());
+            compatDowngraded = true;
+            mHandler.removeMessages(MSG_START_WATCHDOG);
+            mHandler.removeMessages(MSG_BLACK_SCREEN_CHECK);
+            mHandler.removeMessages(MSG_STABLE_PLAY);
+            firstFrameRecorded = false;
+            if (mController != null) {
+                mController.updatePlayerCfgView();
+            }
+            showSwitchToast(reason + "，自动切换为「" + next.displayLabel() + "」");
+            startPlayUrl(currentPlayUrl, currentPlayHeaders);
+            return true;
+        } catch (Throwable th) {
+            LOG.e("tryCompatDowngrade failed: " + th.getMessage());
+            return false;
+        }
+    }
+
+    /** 降级后连续稳定播放且确认出画，则将该模式持久化为本机默认偏好 */
+    private void onStablePlayReached() {
+        if (!compatDowngraded || mVodPlayerCfg == null) return;
+        if (mVideoView != null && mVideoView.getMediaPlayer() instanceof EXOmPlayer) {
+            EXOmPlayer exo = (EXOmPlayer) mVideoView.getMediaPlayer();
+            if (exo.hasVideoTrack() && !exo.isVideoFrameRendered()) {
+                return;
+            }
+        }
+        int pl = PlayerHelper.availablePlayerType(mVodPlayerCfg.optInt("pl", PlaybackCompatProfile.PLAYER_EXO_HW));
+        int pr = PlaybackCompatProfile.normalizeRenderType(mVodPlayerCfg.optInt("pr", PlaybackCompatProfile.RENDER_SURFACE));
+        if (PlaybackCompatProfile.isBuiltInPlayer(pl)) {
+            Hawk.put(HawkConfig.PLAY_TYPE, pl);
+            Hawk.put(HawkConfig.PLAY_RENDER, pr);
+            compatDowngraded = false;
+            if (mVodInfo != null) {
+                mVodInfo.playerCfg = mVodPlayerCfg.toString();
+            }
+            showSwitchToast("已将「" + PlaybackCompatProfile.label(pl, pr) + "」设为本机默认播放模式");
+        }
     }
 
     private void recordFailure() {
@@ -1429,7 +1548,10 @@ public class PlayFragment extends BaseLazyFragment {
         int state = mVideoView.getCurrentPlayState();
         if (state == xyz.doikki.videoplayer.player.VideoView.STATE_PREPARING || state == xyz.doikki.videoplayer.player.VideoView.STATE_PREPARED
                 || state == xyz.doikki.videoplayer.player.VideoView.STATE_BUFFERING) {
-            // 当作播放失败：跳过同地址重试，直接进入换线
+            if (tryCompatDowngrade("起播超时")) {
+                return;
+            }
+            // 所有本地兼容档位均已试过：跳过同地址重试，直接进入换线/换源
             autoRetryCount = 1;
             errorWithRetry("起播超时", false);
         }
@@ -1594,6 +1716,7 @@ public class PlayFragment extends BaseLazyFragment {
         playRequestAt = SystemClock.elapsedRealtime();
         firstFrameRecorded = false;
         mHandler.removeMessages(MSG_START_WATCHDOG);
+        mHandler.removeMessages(MSG_BLACK_SCREEN_CHECK);
         mHandler.removeMessages(MSG_STABLE_PLAY);
         if (playSwitched) {
             savePlaySwitched();

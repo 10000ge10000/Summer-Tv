@@ -30,9 +30,11 @@ import com.github.tvbox.osc.ui.adapter.FastSearchAdapter;
 import com.github.tvbox.osc.ui.adapter.SearchWordAdapter;
 import com.github.tvbox.osc.util.SearchKeywords;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
+import com.github.tvbox.osc.util.PlayableStreamFilter;
 import com.github.tvbox.osc.util.SearchHelper;
 import com.github.tvbox.osc.util.SearchResultMerger;
 import com.github.tvbox.osc.util.SiteQualityStore;
+import com.github.tvbox.osc.util.SmartSourceResolver;
 import com.github.tvbox.osc.util.SourceRanker;
 import com.github.tvbox.osc.viewmodel.SourceViewModel;
 import com.google.gson.Gson;
@@ -67,6 +69,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FastSearchActivity extends BaseActivity {
     private LinearLayout llLayout;
     private TextView mSearchTitle;
+    private TextView btnPlayableFilter;
+    private PlayableStreamFilter streamFilter;
     private TvRecyclerView mGridView;
     private TvRecyclerView mGridViewFilter;
     private TvRecyclerView mGridViewWord;
@@ -106,7 +110,10 @@ public class FastSearchActivity extends BaseActivity {
         public void run() {
             searchDeadlineReached = true;
             flushPending();
-            if (searchAdapter.getData().isEmpty()) {
+            if (streamFilter != null) {
+                streamFilter.markSearchCompleted();
+            }
+            if (searchAdapter.getData().isEmpty() && (streamFilter == null || !streamFilter.isProbing())) {
                 showEmpty();
             }
         }
@@ -169,6 +176,49 @@ public class FastSearchActivity extends BaseActivity {
         mGridView = findViewById(R.id.mGridView);
         mGridViewWord = findViewById(R.id.mGridViewWord);
         mGridViewFilter = findViewById(R.id.mGridViewFilter);
+        btnPlayableFilter = findViewById(R.id.btnPlayableFilter);
+        streamFilter = new PlayableStreamFilter(new PlayableStreamFilter.Callback() {
+            @Override
+            public void onVerifiedPlayable(Movie.Video video) {
+                if (!streamFilter.isPlayableOnly() || isFinishing()) return;
+                List<Movie.Video> single = new ArrayList<>(1);
+                single.add(video);
+                addWordAdapterIfNeed(video.sourceKey);
+                if (SearchResultMerger.merge(searchAdapter, mGridView, single, searchTitle, siteElapsed)) {
+                    showSuccess();
+                    if (!isFilterMode) mGridView.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onProgressChanged(int playableCount, int totalCount, boolean probing) {
+                updateHeaderText(playableCount, totalCount, probing);
+            }
+
+            @Override
+            public void onAllFinished(int playableCount, int totalCount) {
+                if (isFinishing()) return;
+                if (streamFilter.isPlayableOnly() && playableCount == 0 && totalCount > 0) {
+                    streamFilter.setPlayableOnly(false);
+                    updateFilterButton();
+                    rebuildDisplayedList();
+                    Toast.makeText(FastSearchActivity.this, R.string.fs_no_playable_tip, Toast.LENGTH_SHORT).show();
+                } else if (searchAdapter.getData().isEmpty()) {
+                    showEmpty();
+                }
+            }
+        });
+        updateFilterButton();
+        btnPlayableFilter.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) Motion.focusButton(v);
+            else Motion.unfocus(v);
+        });
+        btnPlayableFilter.setOnClickListener(v -> {
+            FastClickCheckUtil.check(v);
+            streamFilter.setPlayableOnly(!streamFilter.isPlayableOnly());
+            updateFilterButton();
+            rebuildDisplayedList();
+        });
 
         mGridViewWord.setHasFixedSize(true);
         mGridViewWord.setLayoutManager(new V7LinearLayoutManager(this.mContext, 1, false));
@@ -348,13 +398,43 @@ public class FastSearchActivity extends BaseActivity {
         }
     }
 
+    private void updateFilterButton() {
+        if (btnPlayableFilter == null || streamFilter == null) return;
+        boolean playableOnly = streamFilter.isPlayableOnly();
+        btnPlayableFilter.setActivated(playableOnly);
+        btnPlayableFilter.setText(playableOnly ? R.string.fs_filter_playable : R.string.fs_filter_all);
+    }
+
+    private void updateHeaderText(int playableCount, int totalCount, boolean probing) {
+        if (mSearchTitle == null || streamFilter == null) return;
+        if (streamFilter.isPlayableOnly()) {
+            mSearchTitle.setText(probing
+                    ? getString(R.string.fs_results_probing, playableCount)
+                    : getString(R.string.fs_results_playable, playableCount));
+        } else {
+            mSearchTitle.setText(getString(R.string.fs_results_all, totalCount));
+        }
+    }
+
+    private void rebuildDisplayedList() {
+        if (streamFilter == null) return;
+        List<Movie.Video> source = streamFilter.isPlayableOnly()
+                ? streamFilter.getVerifiedItems()
+                : streamFilter.getAllItems();
+        List<Movie.Video> ranked = SourceRanker.rank(source, SearchResultMerger.VIDEO_KEYS,
+                searchTitle, SiteQualityStore.quality(), siteElapsed);
+        searchAdapter.setNewData(ranked);
+        if (!ranked.isEmpty()) {
+            showSuccess();
+            if (!isFilterMode) mGridView.setVisibility(View.VISIBLE);
+        } else if (!streamFilter.isProbing()) {
+            showEmpty();
+        }
+        updateHeaderText(streamFilter.getPlayableCount(), streamFilter.getTotalCount(), streamFilter.isProbing());
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void refresh(RefreshEvent event) {
-        if (mSearchTitle != null) {
-//            mSearchTitle.setText(String.format(getString(R.string.fs_results) + " : %d/%d", finishedCount, spNames.size()));
-            finishedCount = searchAdapter.getData().size() + pendingVods.size();
-            mSearchTitle.setText(String.format(getString(R.string.fs_results) + " : %d", finishedCount));
-        }
         if (event.type == RefreshEvent.TYPE_SEARCH_RESULT) {
             try {
                 searchData(event.obj == null ? null : (AbsXml) event.obj);
@@ -391,6 +471,10 @@ public class FastSearchActivity extends BaseActivity {
         siteElapsed.clear();
         searchDeadlineReached = false;
         showAllFocused = false;
+        if (streamFilter != null) {
+            streamFilter.reset();
+            updateHeaderText(0, 0, true);
+        }
         searchStartAt = SystemClock.elapsedRealtime();
         rankHandler.postDelayed(deadlineRunnable, SEARCH_DEADLINE_MS);
 
@@ -417,9 +501,9 @@ public class FastSearchActivity extends BaseActivity {
         searchExecutorService = Executors.newFixedThreadPool(5);
         List<SourceBean> searchRequestList = new ArrayList<>();
         searchRequestList.addAll(ApiConfig.get().getSourceBeanList());
-        SourceBean home = ApiConfig.get().getHomeSourceBean();
-        searchRequestList.remove(home);
-        searchRequestList.add(0, home);
+        // 优先派发高分非熔断站点，让最快可播源第一时间返回并验证通过
+        java.util.Collections.sort(searchRequestList, (a, b) ->
+                Double.compare(SiteQualityStore.score(b.getKey()), SiteQualityStore.score(a.getKey())));
 
         ArrayList<String> siteKey = new ArrayList<>();
         ArrayList<String> hots = new ArrayList<>();
@@ -500,10 +584,13 @@ public class FastSearchActivity extends BaseActivity {
 
         int count = allRunCount.decrementAndGet();
         if (count <= 0) {
-            // 全部站点返回：立即刷新缓冲，再判断是否为空，避免 1.2 秒内全部返回时误判“无结果”
+            // 全部站点返回：立即刷新缓冲，再通知筛选器搜索阶段完成
             flushPending();
             rankHandler.removeCallbacks(deadlineRunnable);
-            if (searchAdapter.getData().size() <= 0) {
+            if (streamFilter != null) {
+                streamFilter.markSearchCompleted();
+            }
+            if (searchAdapter.getData().size() <= 0 && (streamFilter == null || !streamFilter.isProbing())) {
                 showEmpty();
             }
             cancel();
@@ -511,8 +598,8 @@ public class FastSearchActivity extends BaseActivity {
     }
 
     /**
-     * 把缓冲的结果按可播性排序后并入列表。已获得焦点的条目及其之前的部分保持不动，
-     * 新结果只在它之后按分数插入，遥控器焦点不会被挤走。
+     * 把缓冲的结果提交给流式可播探测筛选器；若当前处于“全部源”模式则直接并入列表显示，
+     * “仅看可播”模式下等待后台探测回调逐条流式展示。
      */
     private void flushPending() {
         rankHandler.removeCallbacks(flushRunnable);
@@ -521,7 +608,13 @@ public class FastSearchActivity extends BaseActivity {
         List<Movie.Video> incoming = SourceRanker.rank(pendingVods, SearchResultMerger.VIDEO_KEYS,
                 searchTitle, SiteQualityStore.quality(), siteElapsed);
         pendingVods.clear();
-        // 左侧站点列表：按首次刷新时的排序加入，之后到达的站点追加在末尾
+
+        if (streamFilter != null) {
+            streamFilter.submit(incoming, searchTitle);
+            if (streamFilter.isPlayableOnly()) {
+                return;
+            }
+        }
         String lastKey = null;
         for (Movie.Video v : incoming) {
             if (v.sourceKey != null && !v.sourceKey.equals(lastKey)) {
@@ -532,8 +625,8 @@ public class FastSearchActivity extends BaseActivity {
             showSuccess();
             if (!isFilterMode) mGridView.setVisibility(View.VISIBLE);
         }
-        if (mSearchTitle != null) {
-            mSearchTitle.setText(String.format(getString(R.string.fs_results) + " : %d", searchAdapter.getData().size()));
+        if (streamFilter != null) {
+            updateHeaderText(streamFilter.getPlayableCount(), streamFilter.getTotalCount(), streamFilter.isProbing());
         }
     }
 
@@ -541,6 +634,14 @@ public class FastSearchActivity extends BaseActivity {
         Bundle bundle = new Bundle();
         bundle.putString("id", video.id);
         bundle.putString("sourceKey", video.sourceKey);
+        if (streamFilter != null) {
+            PlayableStreamFilter.Preloaded pre = streamFilter.getPreloaded(video);
+            if (pre != null) {
+                String token = SmartSourceResolver.putPreloadedVod(pre.vodInfo);
+                if (token != null) bundle.putString(SmartSourceResolver.EXTRA_PRELOADED_TOKEN, token);
+                if (pre.matchedFlag != null) bundle.putString(SmartSourceResolver.EXTRA_PREFERRED_FLAG, pre.matchedFlag);
+            }
+        }
         // 同名的其他站点按当前排序交给播放页，播放失败时自动换源
         List<Movie.Video> all = new ArrayList<>(searchAdapter.getData());
         all.addAll(pendingVods);
@@ -556,6 +657,9 @@ public class FastSearchActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         rankHandler.removeCallbacksAndMessages(null);
+        if (streamFilter != null) {
+            streamFilter.destroy();
+        }
         cancel();
         try {
             if (searchExecutorService != null) {

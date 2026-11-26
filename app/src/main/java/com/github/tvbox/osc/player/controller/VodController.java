@@ -49,6 +49,7 @@ import com.github.tvbox.osc.ui.adapter.SelectDialogAdapter;
 import com.github.tvbox.osc.ui.dialog.SelectDialog;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.util.HawkConfig;
+import com.github.tvbox.osc.util.PlaybackCompatProfile;
 import com.github.tvbox.osc.util.PlayerHelper;
 import com.github.tvbox.osc.util.ScreenUtils;
 import com.github.tvbox.osc.util.SubtitleHelper;
@@ -708,12 +709,11 @@ public class VodController extends BaseController {
             public void onClick(View view) {
                 FastClickCheckUtil.check(view);
                 try {
-                    int defaultPos = mPlayerConfig.getInt("pl");
+                    int currentPlayer = PlayerHelper.availablePlayerType(mPlayerConfig.optInt("pl", PlaybackCompatProfile.PLAYER_EXO_HW));
                     ArrayList<Integer> players = new ArrayList<>();
-                    players.add(0);  // System
-                    players.add(1);  // IJK
-                    players.add(2);  // Exo
-                    players.add(3);  // Ali
+                    players.add(PlaybackCompatProfile.PLAYER_EXO_HW); // Exo 硬解优先
+                    players.add(PlaybackCompatProfile.PLAYER_EXO_SW); // Exo 兼容软解
+                    players.add(PlaybackCompatProfile.PLAYER_SYSTEM); // 系统播放器
                     if (mxPlayerExist) {
                         players.add(10);
                     }
@@ -723,6 +723,7 @@ public class VodController extends BaseController {
                     if (KodiExist) {
                         players.add(12);
                     }
+                    int defaultPos = Math.max(0, players.indexOf(currentPlayer));
                     SelectDialog<Integer> dialog = new SelectDialog<>(mActivity);
                     dialog.setTip(HomeActivity.getRes().getString(R.string.dia_player));
                     dialog.setAdapter(null, new SelectDialogAdapter.SelectDialogInterface<Integer>() {
@@ -732,6 +733,10 @@ public class VodController extends BaseController {
                                 dialog.cancel();
                                 int thisPlayType = players.get(pos);
                                 mPlayerConfig.put("pl", thisPlayType);
+                                // 切换内置播放器后同步记住为本机默认，老设备无需每片重切
+                                if (PlaybackCompatProfile.isBuiltInPlayer(thisPlayType)) {
+                                    Hawk.put(HawkConfig.PLAY_TYPE, thisPlayType);
+                                }
                                 updatePlayerCfgView();
                                 listener.updatePlayerCfg();
                                 listener.replay(false);
@@ -756,33 +761,26 @@ public class VodController extends BaseController {
                         }
                     }, players, defaultPos);
                     dialog.show();
-                } catch (JSONException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-        // Button : IJK select software or hardware decoding --------------------
+        // Button : 渲染模式一键切换（SurfaceView / TextureView），复用原 IJK 按钮位
         mPlayerIJKBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
-                    String ijk = mPlayerConfig.getString("ijk");
-                    List<IJKCode> codecs = ApiConfig.get().getIjkCodes();
-                    for (int i = 0; i < codecs.size(); i++) {
-                        if (ijk.equals(codecs.get(i).getName())) {
-                            if (i >= codecs.size() - 1)
-                                ijk = codecs.get(0).getName();
-                            else {
-                                ijk = codecs.get(i + 1).getName();
-                            }
-                            break;
-                        }
-                    }
-                    mPlayerConfig.put("ijk", ijk);
+                    int curRender = PlaybackCompatProfile.normalizeRenderType(
+                            mPlayerConfig.optInt("pr", Hawk.get(HawkConfig.PLAY_RENDER, PlaybackCompatProfile.RENDER_SURFACE)));
+                    int nextRender = (curRender == PlaybackCompatProfile.RENDER_SURFACE)
+                            ? PlaybackCompatProfile.RENDER_TEXTURE
+                            : PlaybackCompatProfile.RENDER_SURFACE;
+                    mPlayerConfig.put("pr", nextRender);
+                    Hawk.put(HawkConfig.PLAY_RENDER, nextRender);
                     updatePlayerCfgView();
                     listener.updatePlayerCfg();
                     listener.replay(false);
-                    // hideBottom();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -1062,13 +1060,14 @@ public class VodController extends BaseController {
         KodiExist = Kodi.getPackageInfo() != null;
     }
 
-    void updatePlayerCfgView() {
+    public void updatePlayerCfgView() {
         try {
-            int playerType = mPlayerConfig.getInt("pl");
+            int playerType = PlayerHelper.availablePlayerType(mPlayerConfig.optInt("pl", PlaybackCompatProfile.PLAYER_EXO_HW));
+            int renderType = PlaybackCompatProfile.normalizeRenderType(mPlayerConfig.optInt("pr", Hawk.get(HawkConfig.PLAY_RENDER, PlaybackCompatProfile.RENDER_SURFACE)));
             mPlayerTxt.setText(PlayerHelper.getPlayerName(playerType));
-            mPlayerScaleTxt.setText(PlayerHelper.getScaleName(mPlayerConfig.getInt("sc")));
-            mPlayerIJKBtn.setText(mPlayerConfig.getString("ijk"));
-            mPlayerIJKBtn.setVisibility(playerType == 1 ? VISIBLE : GONE);
+            mPlayerScaleTxt.setText(PlayerHelper.getScaleName(mPlayerConfig.optInt("sc", 0)));
+            mPlayerIJKBtn.setText(renderType == PlaybackCompatProfile.RENDER_SURFACE ? "Surface" : "Texture");
+            mPlayerIJKBtn.setVisibility(PlaybackCompatProfile.isBuiltInPlayer(playerType) ? VISIBLE : GONE);
             mFFwdTxt.setText("x" + mPlayerConfig.getDouble("sp"));
             mPlayerTimeStartBtn.setText(PlayerUtils.stringForTime(mPlayerConfig.getInt("st") * 1000));
             mPlayerTimeSkipBtn.setText(PlayerUtils.stringForTime(mPlayerConfig.getInt("et") * 1000));

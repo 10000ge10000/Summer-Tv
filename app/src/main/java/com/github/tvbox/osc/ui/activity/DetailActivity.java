@@ -57,6 +57,9 @@ import com.github.tvbox.osc.ui.fragment.PlayFragment;
 import com.github.tvbox.osc.util.SearchKeywords;
 import com.github.tvbox.osc.util.LineOrder;
 import com.github.tvbox.osc.util.PlaybackCandidates;
+import com.github.tvbox.osc.util.SiteQualityStore;
+import com.github.tvbox.osc.util.SmartSourceResolver;
+import com.github.tvbox.osc.util.StreamProbe;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.ImgUtil;
@@ -107,6 +110,7 @@ public class DetailActivity extends BaseActivity {
     private View llPlayerFragmentContainerBlock;
     private View llPlayerPlace;
     private PlayFragment playFragment = null;
+    private View ivThumbFrame;
     private ImageView ivThumb;
     private AmbientBackdrop ambientBackdrop;
     private TextView tvName;
@@ -131,6 +135,10 @@ public class DetailActivity extends BaseActivity {
     private SourceViewModel sourceViewModel;
     private Movie.Video mVideo;
     private VodInfo vodInfo;
+    private String preferredFlag;
+    private boolean userPickedFlag = false;
+    private java.util.concurrent.ExecutorService lineProbeExecutor;
+    private java.util.concurrent.atomic.AtomicBoolean lineProbeCancelled;
     private SeriesFlagAdapter seriesFlagAdapter;
     private SeriesAdapter seriesAdapter;
     public String vodId;
@@ -255,15 +263,14 @@ public class DetailActivity extends BaseActivity {
     }
 
     private void initView() {
-        getWindow().setBackgroundDrawableResource(R.color.color_32364E);
-        getWindow().getDecorView().setBackgroundColor(Color.rgb(16, 20, 24));
         llLayout = findViewById(R.id.llLayout);
-        llLayout.setBackgroundColor(Color.rgb(16, 20, 24));
         llPlayerPlace = findViewById(R.id.previewPlayerPlace);
         llPlayerFragmentContainer = findViewById(R.id.previewPlayer);
         llPlayerFragmentContainerBlock = findViewById(R.id.previewPlayerBlock);
+        ivThumbFrame = findViewById(R.id.ivThumbFrame);
         ivThumb = findViewById(R.id.ivThumb);
         llPlayerPlace.setVisibility(showPreview ? View.VISIBLE : View.GONE);
+        ivThumbFrame.setVisibility(!showPreview ? View.VISIBLE : View.GONE);
         ivThumb.setVisibility(!showPreview ? View.VISIBLE : View.GONE);
         tvName = findViewById(R.id.tvName);
         tvYear = findViewById(R.id.tvYear);
@@ -507,6 +514,7 @@ public class DetailActivity extends BaseActivity {
                 }
                 String newFlag = seriesFlagAdapter.getData().get(position).name;
                 if (vodInfo != null && !vodInfo.playFlag.equals(newFlag)) {
+                    userPickedFlag = true;
                     for (int i = 0; i < vodInfo.seriesFlags.size(); i++) {
                         VodInfo.VodSeriesFlag flag = vodInfo.seriesFlags.get(i);
                         if (flag.name.equals(vodInfo.playFlag)) {
@@ -835,8 +843,7 @@ public class DetailActivity extends BaseActivity {
                     setTextShow(tvDirector, getString(R.string.det_dir), mVideo.director);
                     setTextShow(tvDes, getString(R.string.det_des), removeHtmlTag(mVideo.des));
                     if (!TextUtils.isEmpty(mVideo.pic)) {
-                        // takagen99 : Use Glide instead : Rounding Radius is in pixel
-                        ImgUtil.load(mVideo.pic, ivThumb, 14);
+                        ImgUtil.load(mVideo.pic, ivThumb, 0);
                         ambientBackdrop.show(mVideo.pic);
                     } else {
                         ivThumb.setImageResource(R.drawable.img_loading_placeholder);
@@ -872,8 +879,13 @@ public class DetailActivity extends BaseActivity {
 
                         updateSortButtonText();
 
-                        if (vodInfo.playFlag == null || !vodInfo.seriesMap.containsKey(vodInfo.playFlag))
-                            vodInfo.playFlag = (String) vodInfo.seriesMap.keySet().toArray()[0];
+                        if (vodInfo.playFlag == null || !vodInfo.seriesMap.containsKey(vodInfo.playFlag)) {
+                            if (!TextUtils.isEmpty(preferredFlag) && vodInfo.seriesMap.containsKey(preferredFlag)) {
+                                vodInfo.playFlag = preferredFlag;
+                            } else {
+                                vodInfo.playFlag = (String) vodInfo.seriesMap.keySet().toArray()[0];
+                            }
+                        }
 
                         int flagScrollTo = 0;
                         for (int j = 0; j < vodInfo.seriesFlags.size(); j++) {
@@ -889,6 +901,7 @@ public class DetailActivity extends BaseActivity {
                         mGridViewFlag.scrollToPosition(flagScrollTo);
 
                         refreshList();
+                        startLineProbe(vodInfo, sourceKey);
                         if (showPreview) {
                             jumpToPlay();
                             llPlayerFragmentContainer.setVisibility(View.VISIBLE);
@@ -933,7 +946,165 @@ public class DetailActivity extends BaseActivity {
         if (intent != null && intent.getExtras() != null) {
             Bundle bundle = intent.getExtras();
             candidateToken = bundle.getString(PlaybackCandidates.EXTRA_TOKEN, null);
+            preferredFlag = bundle.getString(SmartSourceResolver.EXTRA_PREFERRED_FLAG, null);
+            String preloadedToken = bundle.getString(SmartSourceResolver.EXTRA_PRELOADED_TOKEN, null);
+            VodInfo preloaded = SmartSourceResolver.takePreloadedVod(preloadedToken);
+            if (preloaded != null) {
+                applyPreloadedVod(preloaded, bundle.getString("id", preloaded.id), bundle.getString("sourceKey", preloaded.sourceKey));
+                return;
+            }
             loadDetail(bundle.getString("id", null), bundle.getString("sourceKey", ""));
+        }
+    }
+
+    /** 消费 SmartSourceResolver 已拉取并测通的 VodInfo，0 额外等待直接渲染详情页 */
+    private void applyPreloadedVod(VodInfo preloaded, String vid, String key) {
+        vodId = vid;
+        sourceKey = key;
+        firstsourceKey = key;
+        boolean isVodCollect = RoomDataManger.isVodCollect(sourceKey, vodId);
+        tvCollect.setText(getString(isVodCollect ? R.string.det_fav_star : R.string.det_fav_unstar));
+
+        Movie.Video v = new Movie.Video();
+        v.id = vodId;
+        v.sourceKey = sourceKey;
+        v.name = preloaded.name;
+        v.type = preloaded.type;
+        v.pic = preloaded.pic;
+        v.lang = preloaded.lang;
+        v.area = preloaded.area;
+        v.year = preloaded.year;
+        v.state = preloaded.state;
+        v.note = preloaded.note;
+        v.actor = preloaded.actor;
+        v.director = preloaded.director;
+        v.des = preloaded.des;
+        v.last = preloaded.last;
+        if (preloaded.seriesFlags != null && preloaded.seriesMap != null) {
+            Movie.Video.UrlBean urlBean = new Movie.Video.UrlBean();
+            urlBean.infoList = new ArrayList<>();
+            for (VodInfo.VodSeriesFlag f : preloaded.seriesFlags) {
+                List<VodInfo.VodSeries> list = preloaded.seriesMap.get(f.name);
+                if (list == null || list.isEmpty()) continue;
+                Movie.Video.UrlBean.UrlInfo ui = new Movie.Video.UrlBean.UrlInfo();
+                ui.flag = f.name;
+                ui.beanList = new ArrayList<>();
+                for (VodInfo.VodSeries s : list) {
+                    ui.beanList.add(new Movie.Video.UrlBean.UrlInfo.InfoBean(s.name, s.url));
+                }
+                urlBean.infoList.add(ui);
+            }
+            v.urlBean = urlBean;
+        }
+        AbsXml abs = new AbsXml();
+        abs.movie = new Movie();
+        abs.movie.videoList = new ArrayList<>();
+        abs.movie.videoList.add(v);
+        sourceViewModel.detailResult.setValue(abs);
+    }
+
+    /** 后台并发轻探当前影片多条直链线路，自动隐藏确认失效的死线并优先选中最快可播线路 */
+    private void startLineProbe(final VodInfo targetInfo, final String targetSourceKey) {
+        cancelLineProbe();
+        if (targetInfo == null || targetInfo.seriesFlags == null || targetInfo.seriesFlags.size() <= 1
+                || targetInfo.seriesMap == null) {
+            return;
+        }
+        final List<VodInfo.VodSeriesFlag> snapshot = new ArrayList<>(targetInfo.seriesFlags);
+        final java.util.concurrent.atomic.AtomicBoolean cancelled = new java.util.concurrent.atomic.AtomicBoolean(false);
+        lineProbeCancelled = cancelled;
+        final java.util.concurrent.ExecutorService pool = java.util.concurrent.Executors.newFixedThreadPool(
+                Math.min(4, snapshot.size()));
+        lineProbeExecutor = pool;
+
+        final java.util.concurrent.ConcurrentHashMap<String, StreamProbe.Result> probeResults =
+                new java.util.concurrent.ConcurrentHashMap<>();
+        final java.util.concurrent.atomic.AtomicInteger remaining = new java.util.concurrent.atomic.AtomicInteger(snapshot.size());
+
+        for (final VodInfo.VodSeriesFlag flag : snapshot) {
+            pool.execute(() -> {
+                try {
+                    if (cancelled.get()) return;
+                    List<VodInfo.VodSeries> list = targetInfo.seriesMap.get(flag.name);
+                    if (list == null || list.isEmpty()) {
+                        probeResults.put(flag.name, new StreamProbe.Result(StreamProbe.Status.FAILED, 0, "empty", flag.name));
+                        return;
+                    }
+                    String url = list.get(0).url;
+                    StreamProbe.Result r = StreamProbe.probeUrl(url, null, cancelled);
+                    if (!cancelled.get()) {
+                        probeResults.put(flag.name, r.withFlag(flag.name));
+                        if (r.isPlayable()) {
+                            SiteQualityStore.recordProbeSuccess(SiteQualityStore.lineKey(targetSourceKey, flag.name), r.latencyMs);
+                        } else if (r.status == StreamProbe.Status.FAILED) {
+                            SiteQualityStore.recordProbeFailure(SiteQualityStore.lineKey(targetSourceKey, flag.name));
+                        }
+                    }
+                } finally {
+                    if (remaining.decrementAndGet() == 0 && !cancelled.get()) {
+                        runOnUiThread(() -> applyLineProbeResults(targetInfo, probeResults));
+                    }
+                }
+            });
+        }
+    }
+
+    private void applyLineProbeResults(VodInfo targetInfo, java.util.Map<String, StreamProbe.Result> results) {
+        if (isFinishing() || vodInfo != targetInfo || results == null || results.isEmpty()) return;
+        List<VodInfo.VodSeriesFlag> playable = new ArrayList<>();
+        List<VodInfo.VodSeriesFlag> unverifiable = new ArrayList<>();
+        for (VodInfo.VodSeriesFlag f : targetInfo.seriesFlags) {
+            StreamProbe.Result r = results.get(f.name);
+            if (r == null || r.status == StreamProbe.Status.UNVERIFIABLE) {
+                unverifiable.add(f);
+            } else if (r.isPlayable()) {
+                playable.add(f);
+            }
+        }
+        // 至少有一条实测可播线路时，隐藏已确认失败的死线，并按延迟升序排列
+        if (playable.isEmpty()) return;
+        java.util.Collections.sort(playable, (a, b) -> {
+            StreamProbe.Result ra = results.get(a.name);
+            StreamProbe.Result rb = results.get(b.name);
+            long la = ra == null ? Long.MAX_VALUE : ra.latencyMs;
+            long lb = rb == null ? Long.MAX_VALUE : rb.latencyMs;
+            return Long.compare(la, lb);
+        });
+        ArrayList<VodInfo.VodSeriesFlag> filteredFlags = new ArrayList<>(playable);
+        filteredFlags.addAll(unverifiable);
+        java.util.LinkedHashMap<String, List<VodInfo.VodSeries>> filteredMap = new java.util.LinkedHashMap<>();
+        for (VodInfo.VodSeriesFlag f : filteredFlags) {
+            filteredMap.put(f.name, targetInfo.seriesMap.get(f.name));
+        }
+        targetInfo.seriesFlags = filteredFlags;
+        targetInfo.seriesMap = filteredMap;
+
+        boolean currentRemoved = !filteredMap.containsKey(targetInfo.playFlag);
+        if (currentRemoved || !userPickedFlag) {
+            targetInfo.playFlag = filteredFlags.get(0).name;
+        }
+        int selectedPos = 0;
+        for (int i = 0; i < filteredFlags.size(); i++) {
+            boolean sel = filteredFlags.get(i).name.equals(targetInfo.playFlag);
+            filteredFlags.get(i).selected = sel;
+            if (sel) selectedPos = i;
+        }
+        seriesFlagAdapter.setNewData(filteredFlags);
+        mGridViewFlag.scrollToPosition(selectedPos);
+        refreshList();
+    }
+
+    private void cancelLineProbe() {
+        if (lineProbeCancelled != null) {
+            lineProbeCancelled.set(true);
+            lineProbeCancelled = null;
+        }
+        if (lineProbeExecutor != null) {
+            try {
+                lineProbeExecutor.shutdownNow();
+            } catch (Throwable ignored) {
+            }
+            lineProbeExecutor = null;
         }
     }
 
@@ -1160,6 +1331,7 @@ public class DetailActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
+        cancelLineProbe();
         super.onDestroy();
         if (ambientBackdrop != null) {
             ambientBackdrop.release();

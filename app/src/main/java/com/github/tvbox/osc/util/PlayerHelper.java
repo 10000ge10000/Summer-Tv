@@ -32,21 +32,19 @@ public class PlayerHelper {
 
     /** @param vodFastStart 点播传 true：Exo 缓冲 1 秒即开播；直播走上面的重载，保持默认缓冲 */
     public static void updateCfg(VideoView videoView, JSONObject playerCfg, int forcePlayerType, boolean vodFastStart) {
-        int playerType = Hawk.get(HawkConfig.PLAY_TYPE, 0);
-        int renderType = Hawk.get(HawkConfig.PLAY_RENDER, 0);
+        int playerType = Hawk.get(HawkConfig.PLAY_TYPE, PlaybackCompatProfile.PLAYER_EXO_HW);
+        int renderType = Hawk.get(HawkConfig.PLAY_RENDER, PlaybackCompatProfile.RENDER_SURFACE);
         String ijkCode = Hawk.get(HawkConfig.IJK_CODEC, "软解码");
         int scale = Hawk.get(HawkConfig.PLAY_SCALE, 0);
-        try {
-            playerType = playerCfg.getInt("pl");
-            //就我遇到的问题是 Exo 在 TextureView 黑屏 调整设置中的渲染模式无法生效
-            //renderType = playerCfg.getInt("pr");//该值无法修改，一旦确认该值后续无法进行修改 就是在设置选的 类型无法应用
-            ijkCode = playerCfg.getString("ijk");
-            scale = playerCfg.getInt("sc");
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (playerCfg != null) {
+            playerType = playerCfg.optInt("pl", playerType);
+            renderType = playerCfg.optInt("pr", renderType);
+            ijkCode = playerCfg.optString("ijk", ijkCode);
+            scale = playerCfg.optInt("sc", scale);
         }
         if (forcePlayerType >= 0) playerType = forcePlayerType;
         playerType = availablePlayerType(playerType);
+        renderType = PlaybackCompatProfile.normalizeRenderType(renderType);
         IJKCode codec = ApiConfig.get().getIJKCodec(ijkCode);
         PlayerFactory playerFactory;
         if (playerType == 1) {
@@ -56,31 +54,27 @@ public class PlayerHelper {
                     return new IjkmPlayer(context, codec);
                 }
             };
-        } else if (playerType == 2) {
+        } else if (playerType == PlaybackCompatProfile.PLAYER_EXO_HW || playerType == PlaybackCompatProfile.PLAYER_EXO_SW) {
+            final boolean preferSw = (playerType == PlaybackCompatProfile.PLAYER_EXO_SW);
             playerFactory = new PlayerFactory<EXOmPlayer>() {
                 @Override
                 public EXOmPlayer createPlayer(Context context) {
                     EXOmPlayer player = new EXOmPlayer(context);
                     player.setFastStart(vodFastStart);
+                    player.setPreferSoftwareDecoder(preferSw);
                     return player;
                 }
             };
         } else {
             playerFactory = AndroidMediaPlayerFactory.create();
         }
-        RenderViewFactory renderViewFactory = null;
-        if (playerType==2){
+        RenderViewFactory renderViewFactory;
+        if (playerType == PlaybackCompatProfile.PLAYER_EXO_HW || playerType == PlaybackCompatProfile.PLAYER_EXO_SW) {
             renderViewFactory = PlayerViewRenderViewFactory.create(renderType);
-        }else{
-            switch (renderType) {
-                case 0:
-                default:
-                    renderViewFactory = TextureRenderViewFactory.create();
-                    break;
-                case 1:
-                    renderViewFactory = SurfaceRenderViewFactory.create();
-                    break;
-            }
+        } else {
+            renderViewFactory = (renderType == PlaybackCompatProfile.RENDER_SURFACE)
+                    ? SurfaceRenderViewFactory.create()
+                    : TextureRenderViewFactory.create();
         }
 
         videoView.setPlayerFactory(playerFactory);
@@ -89,36 +83,29 @@ public class PlayerHelper {
     }
 
     public static void updateCfg(VideoView videoView) {
-        int playType = availablePlayerType(Hawk.get(HawkConfig.PLAY_TYPE, 0));
+        int playType = availablePlayerType(Hawk.get(HawkConfig.PLAY_TYPE, PlaybackCompatProfile.PLAYER_EXO_HW));
+        int renderType = PlaybackCompatProfile.normalizeRenderType(Hawk.get(HawkConfig.PLAY_RENDER, PlaybackCompatProfile.RENDER_SURFACE));
         PlayerFactory playerFactory;
-        if (playType == 1) {
-            playerFactory = new PlayerFactory<IjkmPlayer>() {
-                @Override
-                public IjkmPlayer createPlayer(Context context) {
-                    return new IjkmPlayer(context, null);
-                }
-            };
-
-        } else if (playType == 2) {
+        if (playType == PlaybackCompatProfile.PLAYER_EXO_HW || playType == PlaybackCompatProfile.PLAYER_EXO_SW) {
+            final boolean preferSw = (playType == PlaybackCompatProfile.PLAYER_EXO_SW);
             playerFactory = new PlayerFactory<EXOmPlayer>() {
                 @Override
                 public EXOmPlayer createPlayer(Context context) {
-                    return new EXOmPlayer(context);
+                    EXOmPlayer player = new EXOmPlayer(context);
+                    player.setPreferSoftwareDecoder(preferSw);
+                    return player;
                 }
             };
         } else {
             playerFactory = AndroidMediaPlayerFactory.create();
         }
-        int renderType = Hawk.get(HawkConfig.PLAY_RENDER, 0);
-        RenderViewFactory renderViewFactory = null;
-        switch (renderType) {
-            case 0:
-            default:
-                renderViewFactory = TextureRenderViewFactory.create();
-                break;
-            case 1:
-                renderViewFactory = SurfaceRenderViewFactory.create();
-                break;
+        RenderViewFactory renderViewFactory;
+        if (playType == PlaybackCompatProfile.PLAYER_EXO_HW || playType == PlaybackCompatProfile.PLAYER_EXO_SW) {
+            renderViewFactory = PlayerViewRenderViewFactory.create(renderType);
+        } else {
+            renderViewFactory = (renderType == PlaybackCompatProfile.RENDER_SURFACE)
+                    ? SurfaceRenderViewFactory.create()
+                    : TextureRenderViewFactory.create();
         }
         videoView.setPlayerFactory(playerFactory);
         videoView.setRenderViewFactory(renderViewFactory);
@@ -134,12 +121,12 @@ public class PlayerHelper {
      * 播放器（{@code playerCfg.getInt("pl")}），老记录会把已移除的类型带回来，
      * 只迁移设置值挡不住。
      */
-    private static int availablePlayerType(int playerType) {
-        if (playerType == 1 || playerType == 3) {
-            LOG.i("Player type " + playerType + " has no native library in this build, fallback to Exo");
-            return PLAYER_TYPE_EXO;
+    public static int availablePlayerType(int playerType) {
+        int normalized = PlaybackCompatProfile.normalizePlayerType(playerType);
+        if (normalized != playerType) {
+            LOG.i("Player type " + playerType + " unavailable in this build, fallback to " + normalized);
         }
-        return playerType;
+        return normalized;
     }
 
     public static void init() {
@@ -151,6 +138,8 @@ public class PlayerHelper {
             return "IJK";
         } else if (playType == 2) {
             return "Exo";
+        } else if (playType == 4) {
+            return "Exo软解";
         } else if (playType == 3) {
             return "阿里";
         } else if (playType == 10) {

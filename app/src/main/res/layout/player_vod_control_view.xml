@@ -679,7 +679,7 @@
                 android:layout_width="@dimen/vs_480"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
-                android:fontFamily="sans-serif"
+                android:fontFamily="sans-serif-medium"
                 android:gravity="right"
                 android:maxLines="1"
                 android:paddingRight="@dimen/vs_50"
@@ -688,8 +688,8 @@
                 android:shadowDy="0"
                 android:shadowRadius="3"
                 android:text="09:30 PM"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/vs_60"
+                android:textColor="@color/st_text_primary"
+                android:textSize="@dimen/ts_36"
                 android:textStyle="normal"
                 android:visibility="visible" />
         </LinearLayout>
@@ -716,8 +716,8 @@
                 android:shadowDx="0"
                 android:shadowDy="0"
                 android:shadowRadius="3"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/vs_20"
+                android:textColor="@color/st_text_secondary"
+                android:textSize="@dimen/ts_20"
                 android:textStyle="normal"
                 android:visibility="visible" />
 
@@ -735,8 +735,8 @@
                 android:shadowDy="0"
                 android:shadowRadius="3"
                 android:text=""
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/vs_20"
+                android:textColor="@color/st_text_secondary"
+                android:textSize="@dimen/ts_20"
                 android:textStyle="normal"
                 android:visibility="visible" />
         </LinearLayout>
@@ -1025,8 +1025,9 @@
 	
 	            <TextView
 	                android:id="@+id/play_ijk"
-	                android:layout_width="@dimen/vs_60"
+	                android:layout_width="wrap_content"
 	                android:layout_height="@dimen/vs_60"
+	                android:minWidth="@dimen/vs_60"
 	                android:layout_gravity="center"
 	                android:layout_marginStart="@dimen/vs_6"
 	                android:layout_marginLeft="@dimen/vs_6"
@@ -1036,8 +1037,10 @@
 	                android:drawablePadding="@dimen/vs_6"
 	                android:focusable="true"
 	                android:gravity="center"
-	                android:padding="@dimen/vs_8"
-	                android:text="硬解码"
+	                android:paddingStart="@dimen/vs_12"
+	                android:paddingEnd="@dimen/vs_12"
+	                android:singleLine="true"
+	                android:text="Surface"
 	                android:textColor="@android:color/white"
 	                android:textSize="@dimen/ts_14" />
 	

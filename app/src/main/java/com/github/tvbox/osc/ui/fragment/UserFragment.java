@@ -25,6 +25,7 @@ import com.github.tvbox.osc.ui.activity.*;
 import com.github.tvbox.osc.ui.adapter.HomeHotVodAdapter;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.util.HawkConfig;
+import com.github.tvbox.osc.util.SmartSourceResolver;
 import com.github.tvbox.osc.util.UA;
 import com.github.tvbox.osc.util.ImgUtil;
 import com.github.tvbox.osc.util.DailyPick;
@@ -151,6 +152,13 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
         heroPlay = userHomeHeader.findViewById(R.id.heroPlay);
         heroPoster = userHomeHeader.findViewById(R.id.heroPoster);
         heroPlay.setOnClickListener(this);
+        heroPlay.setOnLongClickListener(v -> {
+            if (heroVod != null && heroVod.name != null && !heroVod.name.trim().isEmpty()) {
+                SmartSourceResolver.openManualSearch(mActivity, heroVod.name);
+                return true;
+            }
+            return false;
+        });
         heroPlay.setOnFocusChangeListener(focusChangeListener);
         // 向下落到正下方的海报列；向上由 nextFocusUp 回到分类 Tab
         heroPlay.setOnKeyListener(headerEntryKeyListener);
@@ -718,21 +726,17 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
         Glide.with(mActivity).load(model).centerCrop().into(heroPoster);
     }
 
-    /** 打开一部影片：豆瓣条目走聚合搜索，能直接打开详情的进详情页，其余走搜索 */
+    /** 打开一部影片：继续观看直接续播；豆瓣/推荐条目静默优选最快可播源（电影直播、剧集进详情）；长按海报才手动选源 */
     private void openVod(Movie.Video vod) {
-        if (vod.id != null && !vod.id.isEmpty()) {
-            Bundle bundle = new Bundle();
-            bundle.putString("id", vod.id);
-            bundle.putString("sourceKey", vod.sourceKey);
-            if (vod.id.startsWith("msearch:")) {
-                bundle.putString("title", vod.name);
-                jumpActivity(FastSearchActivity.class, bundle);
-                return;
-            }
-            if (canOpenDetail(vod)) {
-                jumpActivity(DetailActivity.class, bundle);
-                return;
-            }
+        if (vod == null) return;
+        if (vod.id != null && !vod.id.isEmpty() && !vod.id.startsWith("msearch:") && canOpenDetail(vod)) {
+            boolean isHistory = Hawk.get(HawkConfig.HOME_REC, 0) == 2 || (vod == heroVod && heroVod != null);
+            SmartSourceResolver.openDirectRecord(mActivity, vod.sourceKey, vod.id, isHistory);
+            return;
+        }
+        if (vod.name != null && !vod.name.trim().isEmpty()) {
+            SmartSourceResolver.resolveAndOpen(mActivity, vod.name);
+            return;
         }
         Intent newIntent = new Intent(mContext, Hawk.get(HawkConfig.FAST_SEARCH_MODE, false) ? FastSearchActivity.class : SearchActivity.class);
         newIntent.putExtra("title", vod.name);

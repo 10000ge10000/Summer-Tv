@@ -35,6 +35,7 @@ import com.github.tvbox.osc.ui.dialog.GridFilterDialog;
 import com.github.tvbox.osc.ui.tv.widget.LoadMoreView;
 import com.github.tvbox.osc.util.ImgUtil;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
+import com.github.tvbox.osc.util.SmartSourceResolver;
 import com.github.tvbox.osc.util.LOG;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.MD5;
@@ -648,9 +649,9 @@ public class GridFragment extends BaseLazyFragment {
                             changeView(video.id,false);
                         }
                     } else {
-                        // 子分类内容作为聚合/展示，点击效果与首页一致进入多源聚合搜索结果
+                        // 单击海报静默优选最快可播源（电影直达播放，剧集进优选详情）
                         if (video.name != null && !video.name.trim().isEmpty()) {
-                            jumpActivity(FastSearchActivity.class, bundle);
+                            SmartSourceResolver.resolveAndOpen(mActivity, video.name);
                         } else if (video.id != null && !video.id.isEmpty() && !video.id.startsWith("msearch:")) {
                             jumpActivity(DetailActivity.class, bundle);
                         } else {
@@ -661,21 +662,21 @@ public class GridFragment extends BaseLazyFragment {
                 }
             }
         });
-        // 长按保留直接进入当前源详情页的能力
+        // 长按海报进入聚合搜索结果页手动选源
         gridAdapter.setOnItemLongClickListener(new BaseQuickAdapter.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(BaseQuickAdapter adapter, View view, int position) {
                 FastClickCheckUtil.check(view);
                 Movie.Video video = gridAdapter.getData().get(position);
                 if (video != null) {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("id", video.id);
-                    bundle.putString("sourceKey", video.sourceKey);
-                    bundle.putString("title", video.name);
-                    if (video.id != null && !video.id.isEmpty() && !video.id.startsWith("msearch:")) {
+                    if (video.name != null && !video.name.trim().isEmpty()) {
+                        SmartSourceResolver.openManualSearch(mActivity, video.name);
+                    } else if (video.id != null && !video.id.isEmpty() && !video.id.startsWith("msearch:")) {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", video.id);
+                        bundle.putString("sourceKey", video.sourceKey);
+                        bundle.putString("title", video.name);
                         jumpActivity(DetailActivity.class, bundle);
-                    } else {
-                        jumpActivity(FastSearchActivity.class, bundle);
                     }
                 }
                 return true;

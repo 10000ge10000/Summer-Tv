@@ -64,12 +64,13 @@
                 android:layout_width="@dimen/st_rail_icon"
                 android:layout_height="@dimen/st_rail_icon"
                 android:duplicateParentState="true"
-                app:srcCompat="@drawable/hm_search" />
+                app:srcCompat="@drawable/hm_search"
+                app:tint="@color/st_rail_text" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/vs_0"
+                android:layout_marginTop="@dimen/vs_4"
                 android:duplicateParentState="true"
                 android:singleLine="true"
                 android:text="@string/hm_search"
@@ -91,12 +92,13 @@
                 android:layout_width="@dimen/st_rail_icon"
                 android:layout_height="@dimen/st_rail_icon"
                 android:duplicateParentState="true"
-                app:srcCompat="@drawable/hm_history" />
+                app:srcCompat="@drawable/hm_history"
+                app:tint="@color/st_rail_text" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/vs_10"
+                android:layout_marginTop="@dimen/vs_4"
                 android:duplicateParentState="true"
                 android:singleLine="true"
                 android:text="@string/hm_hist"
@@ -118,12 +120,13 @@
                 android:layout_width="@dimen/st_rail_icon"
                 android:layout_height="@dimen/st_rail_icon"
                 android:duplicateParentState="true"
-                app:srcCompat="@drawable/hm_fav" />
+                app:srcCompat="@drawable/hm_fav"
+                app:tint="@color/st_rail_text" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/vs_10"
+                android:layout_marginTop="@dimen/vs_4"
                 android:duplicateParentState="true"
                 android:singleLine="true"
                 android:text="@string/hm_fav"
@@ -145,12 +148,13 @@
                 android:layout_width="@dimen/st_rail_icon"
                 android:layout_height="@dimen/st_rail_icon"
                 android:duplicateParentState="true"
-                app:srcCompat="@drawable/hm_live" />
+                app:srcCompat="@drawable/hm_live"
+                app:tint="@color/st_rail_text" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/vs_10"
+                android:layout_marginTop="@dimen/vs_4"
                 android:duplicateParentState="true"
                 android:singleLine="true"
                 android:text="@string/hm_live"
@@ -204,38 +208,53 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- 应用内小标志（第三轮：替代原橙色竖条），后面跟小一号的 Summer TV 字标；点标志或字标打开关于页 -->
-        <ImageView
-            android:id="@+id/stLogoMark"
+        <!-- 应用内小标志与字标合并为一体聚焦胶囊，点击打开关于页，长按清缓存刷新 -->
+        <LinearLayout
+            android:id="@+id/brandEntry"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/st_logo_mark_size"
-            android:adjustViewBounds="true"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="@dimen/vs_8"
-            android:layout_marginRight="@dimen/vs_8"
-            android:importantForAccessibility="no"
-            app:srcCompat="@drawable/st_logo_mark" />
-
-        <TextView
-            android:id="@+id/tvName"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="@dimen/st_pill_height"
             android:layout_marginEnd="@dimen/vs_20"
             android:layout_marginRight="@dimen/vs_20"
+            android:background="@drawable/st_brand_pill"
             android:clickable="true"
-            android:ellipsize="marquee"
             android:focusable="true"
             android:focusableInTouchMode="false"
-            android:gravity="left|center_vertical"
-            android:nextFocusRight="@id/mGridViewCategory"
+            android:gravity="center_vertical"
             android:nextFocusDown="@id/mViewPager"
-            android:singleLine="true"
-            android:text="@string/app_name"
-            android:textAlignment="gravity"
-            android:textColor="@color/font_home_selector"
-            android:background="@drawable/shape_toplayout_tvname"
-            android:textSize="@dimen/st_text_logo"
-            android:textStyle="bold" />
+            android:nextFocusRight="@id/mGridViewCategory"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/vs_10"
+            android:paddingRight="@dimen/vs_14">
+
+            <ImageView
+                android:id="@+id/stLogoMark"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/st_logo_mark_size"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="@dimen/vs_8"
+                android:layout_marginRight="@dimen/vs_8"
+                android:adjustViewBounds="true"
+                android:duplicateParentState="true"
+                android:focusable="false"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/st_logo_mark" />
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:duplicateParentState="true"
+                android:ellipsize="marquee"
+                android:focusable="false"
+                android:gravity="left|center_vertical"
+                android:includeFontPadding="false"
+                android:singleLine="true"
+                android:text="@string/app_name"
+                android:textAlignment="gravity"
+                android:textColor="@color/st_text_primary"
+                android:textSize="@dimen/st_text_logo"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <!-- 分类标签居中：两侧等权留白；topBarBalance 在代码里设成左侧标志区的宽度，使标签相对整屏居中 -->
         <Space
@@ -249,7 +268,7 @@
             android:layout_height="match_parent"
             android:clipChildren="false"
             android:clipToPadding="false"
-            android:nextFocusLeft="@id/tvName"
+            android:nextFocusLeft="@id/brandEntry"
             android:nextFocusDown="@id/mViewPager"
             app:tv_selectedItemIsCentered="true" />
 

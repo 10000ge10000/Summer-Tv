@@ -1,29 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 通用弹窗按钮（配白字使用）：默认半透明圆角，聚焦深暖色底 + 主题色描边，兼顾高对比与新规范 -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_focused="true" android:state_pressed="true">
-        <shape>
-            <corners android:radius="@dimen/vs_5" />
-            <solid android:color="?attr/color_theme_dark_70" />
-        </shape>
-    </item>
-    <item android:state_focused="false" android:state_pressed="true">
-        <shape>
-            <corners android:radius="@dimen/vs_5" />
-            <solid android:color="?attr/color_theme_dark_70" />
-        </shape>
-    </item>
     <item android:state_focused="true">
-        <shape>
-            <corners android:radius="@dimen/vs_5" />
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_chip" />
             <solid android:color="?attr/color_theme_dark_70" />
-	    <!--添加选中外边框-->
-	    <stroke android:width="2mm" android:color="@android:color/white" />
+            <stroke android:width="@dimen/st_focus_stroke" android:color="?attr/color_theme" />
         </shape>
     </item>
-    <item android:state_focused="false" android:state_pressed="false">
-        <shape>
-            <corners android:radius="@dimen/vs_5" />
-            <solid android:color="@color/color_000000_60" />
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_chip" />
+            <solid android:color="?attr/color_theme_40" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/st_radius_chip" />
+            <solid android:color="@color/st_surface" />
         </shape>
     </item>
 </selector>

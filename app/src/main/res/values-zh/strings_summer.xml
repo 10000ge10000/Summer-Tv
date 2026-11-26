@@ -21,4 +21,21 @@
     <string name="about_analytics">匿名统计：%1$s</string>
     <string name="about_analytics_note">默认开启，仅上报版本、渠道、设备类型、播放场景和随机安装标识，不传片源与搜索词；可随时关闭。</string>
     <string name="about_scroll_hint">按上下键滚动阅读</string>
+    <string name="act_search_history">搜索历史</string>
+    <string name="det_empty_playlist">暂无播放数据</string>
+    <string name="det_empty_playlist_hint">可以试试点上方「快搜」切换其他片源</string>
+    <string name="det_desc_title">影片简介</string>
+    <string name="play_loading">正在加载…</string>
+    <string name="dia_yes">确定</string>
+    <string name="dia_no">取消</string>
+    <string name="act_del_done">完成</string>
+    <string name="smart_resolving">正在搜索全网片源…</string>
+    <string name="smart_probing">正在验证可播线路…</string>
+    <string name="smart_cancel_hint">按返回键取消 · 长按海报可手动选源</string>
+    <string name="fs_filter_playable">仅看可播</string>
+    <string name="fs_filter_all">全部源</string>
+    <string name="fs_results_playable">可播结果 : %1$d</string>
+    <string name="fs_results_probing">可播结果 : %1$d（筛选中…）</string>
+    <string name="fs_results_all">全部结果 : %1$d</string>
+    <string name="fs_no_playable_tip">未检测到直链可播源，已为你切换为全部源</string>
 </resources>

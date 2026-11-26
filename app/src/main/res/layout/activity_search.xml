@@ -1,91 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 搜索略缩图页面 -->
+<!-- 搜索页面（Summer TV st_* 视觉统一） -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:background="@color/st_bg"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/vs_25"
+    android:paddingTop="@dimen/vs_15"
+    android:paddingRight="@dimen/vs_25"
+    android:paddingBottom="@dimen/vs_15">
 
+    <!-- 左栏：搜索控制与软键盘 -->
     <LinearLayout
         android:layout_width="@dimen/vs_420"
         android:layout_height="match_parent"
+        android:background="@drawable/st_dialog_bg"
         android:orientation="vertical"
-        android:padding="@dimen/vs_20">
+        android:padding="@dimen/vs_14">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/vs_5"
+            android:layout_marginBottom="@dimen/vs_6"
             android:gravity="center_vertical"
             android:orientation="vertical">
-            	
+
             <TextView
                 android:id="@+id/filterBtn"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/vs_50"
-                android:layout_weight="1"
+                android:layout_height="@dimen/vs_45"
                 android:background="@drawable/shape_user_focus"
                 android:focusable="true"
                 android:gravity="center"
+                android:singleLine="true"
                 android:text="@string/global_search"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/ts_20" />
+                android:textColor="@color/st_accent_focus_text"
+                android:textSize="@dimen/st_text_body"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/vs_50"
-                android:layout_marginTop="@dimen/vs_10"
+                android:layout_height="@dimen/vs_45"
+                android:layout_marginTop="@dimen/vs_8"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
-                	
+
                 <com.github.tvbox.osc.ui.tv.widget.CustomEditText
                     android:id="@+id/etSearch"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/vs_50"
-                    android:layout_marginEnd="@dimen/vs_10"
-                    android:layout_marginRight="@dimen/vs_10"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/vs_8"
+                    android:layout_marginRight="@dimen/vs_8"
                     android:layout_weight="1"
                     android:background="@drawable/input_search"
                     android:hint="@string/act_search_txt"
-                    android:inputType="text"
-                    android:singleLine="true"
                     android:imeOptions="actionDone"
+                    android:inputType="text"
                     android:maxLines="1"
-                    android:paddingLeft="@dimen/vs_10"
-                    android:paddingRight="@dimen/vs_10"
-                    android:textColor="@android:color/white"
-                    android:textColorHint="#70FFFFFF"
-                    android:textSize="@dimen/ts_20" />
+                    android:paddingLeft="@dimen/vs_12"
+                    android:paddingRight="@dimen/vs_12"
+                    android:singleLine="true"
+                    android:textColor="@color/st_text_primary"
+                    android:textColorHint="@color/st_text_tertiary"
+                    android:textSize="@dimen/st_text_body" />
 
                 <ImageView
                     android:id="@+id/tvSearchCheckbox"
-                    android:layout_width="@dimen/vs_50"
-                    android:layout_height="@dimen/vs_50"
+                    android:layout_width="@dimen/vs_45"
+                    android:layout_height="@dimen/vs_45"
                     android:layout_gravity="center"
-                    android:layout_margin="@dimen/vs_2"
                     android:background="@drawable/shape_user_focus"
                     android:focusable="true"
-                    android:padding="@dimen/vs_5"
-                    android:src="@drawable/icon_filter" />
-
+                    android:padding="@dimen/vs_10"
+                    app:srcCompat="@drawable/icon_filter"
+                    app:tint="@color/st_accent_focus_text" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/vs_50"
-                android:layout_marginTop="@dimen/vs_10"
+                android:layout_height="@dimen/vs_45"
+                android:layout_marginTop="@dimen/vs_8"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tvSearch"
                     android:layout_width="0mm"
-                    android:layout_height="@dimen/vs_50"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="@drawable/shape_user_focus"
+                    android:background="@drawable/st_button_pill_primary"
                     android:focusable="true"
                     android:gravity="center"
                     android:text="@string/act_search"
-                    android:textColor="@android:color/white"
-                    android:textSize="@dimen/ts_20" />
+                    android:textColor="@color/st_button_primary_text"
+                    android:textSize="@dimen/st_text_body"
+                    android:textStyle="bold" />
 
                 <Space
                     android:layout_width="@dimen/vs_10"
@@ -94,14 +103,15 @@
                 <TextView
                     android:id="@+id/tvClear"
                     android:layout_width="0mm"
-                    android:layout_height="@dimen/vs_50"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="@drawable/shape_user_focus"
+                    android:background="@drawable/st_button_pill"
                     android:focusable="true"
                     android:gravity="center"
                     android:text="@string/act_search_clr"
-                    android:textColor="@android:color/white"
-                    android:textSize="@dimen/ts_20" />
+                    android:textColor="@color/st_button_text"
+                    android:textSize="@dimen/st_text_body"
+                    android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
 
@@ -125,8 +135,8 @@
                 android:layout_marginTop="@dimen/vs_20"
                 android:gravity="center_horizontal"
                 android:lineSpacingMultiplier="1.4"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/ts_20" />
+                android:textColor="@color/st_text_primary"
+                android:textSize="@dimen/st_text_body" />
 
             <ImageView
                 android:id="@+id/ivQRCode"
@@ -137,24 +147,40 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- 中栏：热门搜索 -->
     <LinearLayout
         android:id="@+id/llWord"
         android:layout_width="@dimen/vs_260"
         android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/vs_25"
+        android:layout_marginLeft="@dimen/vs_25"
         android:orientation="vertical"
-        android:paddingTop="@dimen/vs_20"
-        android:paddingBottom="@dimen/vs_20">
+        android:paddingTop="@dimen/vs_8"
+        android:paddingBottom="@dimen/vs_8">
 
-        <TextView           
-            android:id="@+id/mHotSearch_text"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="@dimen/vs_10"
-            android:text="@string/act_search_trend"
-            android:textAlignment="viewStart"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/ts_22" />
+            android:layout_marginBottom="@dimen/vs_14"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="@dimen/vs_4"
+                android:layout_height="@dimen/vs_25"
+                android:layout_marginEnd="@dimen/vs_10"
+                android:layout_marginRight="@dimen/vs_10"
+                android:background="@drawable/st_accent_bar" />
+
+            <TextView
+                android:id="@+id/mHotSearch_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/act_search_trend"
+                android:textAlignment="viewStart"
+                android:textAppearance="@style/TextAppearance.Summer.Subtitle"
+                android:textColor="@color/st_text_primary" />
+        </LinearLayout>
 
         <com.owen.tvrecyclerview.widget.TvRecyclerView
             android:id="@+id/mGridViewWord"
@@ -162,61 +188,126 @@
             android:layout_height="match_parent"
             android:clipChildren="false"
             android:clipToPadding="false"
-            app:tv_horizontalSpacingWithMargins="@dimen/vs_5"
+            app:tv_horizontalSpacingWithMargins="@dimen/vs_6"
             app:tv_selectedItemIsCentered="true"
-            app:tv_verticalSpacingWithMargins="@dimen/vs_5" />
+            app:tv_verticalSpacingWithMargins="@dimen/vs_8" />
     </LinearLayout>
 
+    <!-- 右栏：搜索历史与搜索结果 -->
     <LinearLayout
         android:id="@+id/llLayout"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/vs_25"
+        android:layout_marginLeft="@dimen/vs_25"
+        android:layout_weight="1"
         android:orientation="vertical"
-        android:padding="@dimen/vs_20">
-        
+        android:paddingTop="@dimen/vs_8">
+
         <RelativeLayout
             android:id="@+id/search_tips"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ll_search_layout">
+            android:paddingLeft="@dimen/vs_10"
+            android:paddingRight="@dimen/vs_10">
 
-            <TextView
-                android:textColor="@android:color/white"
-                android:id="@+id/title_history"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/vs_20"
-                android:textSize="@dimen/ts_22"
-                android:text="搜索历史" />
+                android:layout_centerVertical="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            <ImageView                
+                <View
+                    android:layout_width="@dimen/vs_4"
+                    android:layout_height="@dimen/vs_25"
+                    android:layout_marginEnd="@dimen/vs_10"
+                    android:layout_marginRight="@dimen/vs_10"
+                    android:background="@drawable/st_accent_bar" />
+
+                <TextView
+                    android:id="@+id/title_history"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/act_search_history"
+                    android:textAppearance="@style/TextAppearance.Summer.Subtitle"
+                    android:textColor="@color/st_text_primary" />
+            </LinearLayout>
+
+            <ImageView
                 android:id="@+id/clear_history"
-                android:layout_width="@dimen/vs_50"
-                android:layout_height="@dimen/vs_50"
-                android:gravity="center"
-                android:background="@drawable/shape_user_focus"
+                android:layout_width="@dimen/st_icon_button_size"
+                android:layout_height="@dimen/st_icon_button_size"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/st_icon_button"
                 android:focusable="true"
                 android:focusableInTouchMode="false"
-                android:padding="@dimen/vs_5"
-                android:layout_marginRight="@dimen/vs_20"              
-                android:src="@drawable/icon_delete"
-                android:layout_alignParentRight="true" />
+                android:padding="@dimen/vs_8"
+                app:srcCompat="@drawable/icon_delete"
+                app:tint="@color/st_accent_focus_text" />
         </RelativeLayout>
 
         <com.yang.flowlayoutlibrary.FlowLayout
             android:id="@+id/tv_history"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/vs_20"
-            android:layout_marginTop="@dimen/vs_20"
-            android:layout_marginRight="@dimen/vs_20"
+            android:layout_marginLeft="@dimen/vs_10"
+            android:layout_marginTop="@dimen/vs_15"
+            android:layout_marginRight="@dimen/vs_10"
             app:backgroundResource="@drawable/shape_user_focus"
-            app:horizontalSpacing="@dimen/vs_20"
-            app:itemColor="@android:color/white"
-            app:itemSize="@dimen/vs_20"
-            app:textPaddingH="@dimen/vs_20"
-            app:textPaddingV="@dimen/vs_10"
-            app:verticalSpacing="@dimen/vs_20" />        
+            app:horizontalSpacing="@dimen/vs_14"
+            app:itemColor="@color/st_accent_focus_text"
+            app:itemSize="@dimen/st_text_body"
+            app:textPaddingH="@dimen/vs_15"
+            app:textPaddingV="@dimen/vs_8"
+            app:verticalSpacing="@dimen/vs_14" />
+
+        <LinearLayout
+            android:id="@+id/searchResultBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/vs_15"
+            android:paddingRight="@dimen/vs_15"
+            android:paddingBottom="@dimen/vs_8"
+            android:visibility="gone">
+
+            <View
+                android:layout_width="@dimen/vs_4"
+                android:layout_height="@dimen/vs_25"
+                android:layout_marginEnd="@dimen/vs_10"
+                android:layout_marginRight="@dimen/vs_10"
+                android:background="@drawable/st_accent_bar" />
+
+            <TextView
+                android:id="@+id/tvSearchResultTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:singleLine="true"
+                android:text="@string/fs_results"
+                android:textAppearance="@style/TextAppearance.Summer.Subtitle"
+                android:textColor="@color/st_text_primary" />
+
+            <TextView
+                android:id="@+id/btnPlayableFilter"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/st_pill_height"
+                android:background="@drawable/st_chip_pill"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingLeft="@dimen/st_button_padding_h"
+                android:paddingRight="@dimen/st_button_padding_h"
+                android:singleLine="true"
+                android:text="@string/fs_filter_playable"
+                android:textColor="@color/st_tab_text"
+                android:textSize="@dimen/st_text_body"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <com.owen.tvrecyclerview.widget.TvRecyclerView
             android:id="@+id/mGridView"
@@ -224,10 +315,10 @@
             android:layout_height="match_parent"
             android:clipChildren="false"
             android:clipToPadding="false"
+            android:padding="@dimen/vs_15"
             android:visibility="invisible"
-            android:padding="@dimen/vs_25"
-            app:tv_horizontalSpacingWithMargins="@dimen/vs_5"
-            app:tv_verticalSpacingWithMargins="@dimen/vs_5"
-            app:tv_selectedItemIsCentered="true" />
+            app:tv_horizontalSpacingWithMargins="@dimen/st_card_gap"
+            app:tv_selectedItemIsCentered="true"
+            app:tv_verticalSpacingWithMargins="@dimen/st_card_gap" />
     </LinearLayout>
 </LinearLayout>

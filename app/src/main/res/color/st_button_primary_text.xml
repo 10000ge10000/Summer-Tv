@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 主操作按钮（珊瑚橙默认态 / 浅白聚焦态）文字色：双态均使用深色高对比文字 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/st_bg" android:state_focused="true" />
+    <item android:color="@color/st_on_accent" />
+</selector>

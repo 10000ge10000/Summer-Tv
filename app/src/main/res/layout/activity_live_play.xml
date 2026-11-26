@@ -236,8 +236,8 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="暂无节目信息…"
-                android:textColor="@color/color_FFFFFF"
+                android:text="@string/live_epg_empty"
+                android:textColor="@color/st_text_secondary"
                 android:visibility="gone" />
 
         </LinearLayout>
@@ -371,7 +371,7 @@
                     android:shadowDy="0"
                     android:shadowRadius="3"
                     android:singleLine="true"
-                    android:text="No information"
+                    android:text="@string/live_epg_no_info"
                     android:textColor="@color/color_FFFFFF"
                     android:textSize="@dimen/ts_36"
                     android:textStyle="bold" />
@@ -551,7 +551,7 @@
                     android:shadowDy="0"
                     android:shadowRadius="3"
                     android:singleLine="true"
-                    android:text="No information"
+                    android:text="@string/live_epg_no_info"
                     android:textColor="@color/color_FFFFFF"
                     android:textSize="@dimen/ts_20"
                     android:textStyle="normal" />
