@@ -95,8 +95,11 @@
     <dimen name="st_focus_stroke">3mm</dimen>
     <dimen name="st_card_stroke">2mm</dimen>
     <dimen name="st_radius_card_inner">10mm</dimen>
-    <!-- 海报网格间距（第三轮：每行 4 个，间距加大） -->
-    <dimen name="st_poster_gap">28mm</dimen>
+    <!-- 海报网格尺寸与间距（一屏完整显示 2 排 × 5 列海报） -->
+    <dimen name="st_poster_gap">18mm</dimen>
+    <dimen name="st_poster_gap_h">20mm</dimen>
+    <dimen name="st_grid_poster_width">178mm</dimen>
+    <dimen name="st_grid_poster_height">226mm</dimen>
     <!-- 卡片尺寸 -->
     <dimen name="st_card_land_width">300mm</dimen>
     <dimen name="st_card_land_height">169mm</dimen>

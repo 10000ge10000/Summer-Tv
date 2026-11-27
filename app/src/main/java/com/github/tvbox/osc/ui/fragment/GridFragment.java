@@ -208,6 +208,8 @@ public class GridFragment extends BaseLazyFragment {
         subCategoryAdapter.setNewData(sortData.children);
         subCategoryAdapter.setSelectedId(activeSortData == null ? null : activeSortData.id);
         mSubCategoryView.setLayoutManager(new V7LinearLayoutManager(mContext, 0, false));
+        mSubCategoryView.setItemAnimator(null);
+        mSubCategoryView.setPreserveFocusAfterLayout(true);
         mSubCategoryView.setAdapter(subCategoryAdapter);
         mSubCategoryView.setOnItemListener(new TvRecyclerView.OnItemListener() {
             @Override public void onItemPreSelected(TvRecyclerView parent, View itemView, int position) {
@@ -235,17 +237,33 @@ public class GridFragment extends BaseLazyFragment {
                 if (subCategoryAdapter != null && position >= 0 && position < subCategoryAdapter.getData().size()) {
                     mSubCategoryView.removeCallbacks(subCategoryRunnable);
                     MovieSort.SortData selected = subCategoryAdapter.getItem(position);
-                    selectSubCategory(selected);
+                    boolean alreadyActive = selected != null && activeSortData != null
+                            && selected.id != null && selected.id.equals(activeSortData.id);
+                    if (alreadyActive) {
+                        if (mGridView != null && gridAdapter != null && !gridAdapter.getData().isEmpty()) {
+                            mGridView.requestFocus();
+                            if (getActivity() instanceof HomeActivity) {
+                                ((HomeActivity) getActivity()).setPosterBrowseMode(true);
+                            }
+                        }
+                    } else {
+                        selectSubCategory(selected);
+                    }
                 }
             }
         });
         mSubCategoryView.setOnInBorderKeyEventListener(new TvRecyclerView.OnInBorderKeyEventListener() {
             @Override
             public boolean onInBorderKeyEvent(int direction, View focused) {
-                // 向左进入首页左侧导航栏（首页二次重构）
-                if (direction == View.FOCUS_LEFT && getActivity() instanceof HomeActivity
-                        && ((HomeActivity) getActivity()).focusNavRail()) {
-                    return true;
+                // 仅当真正位于首个子分类且未滑动时，按左键才进入左侧导航栏，避免快速左滑误跳搜索
+                if (direction == View.FOCUS_LEFT) {
+                    int focusedPos = focused != null ? mSubCategoryView.getChildAdapterPosition(focused) : -1;
+                    if (focusedPos > 0) {
+                        return false;
+                    }
+                    if (getActivity() instanceof HomeActivity && ((HomeActivity) getActivity()).focusNavRail()) {
+                        return true;
+                    }
                 }
                 if (direction == View.FOCUS_UP || direction == View.FOCUS_LEFT) {
                     if (getActivity() instanceof HomeActivity) {
@@ -279,19 +297,13 @@ public class GridFragment extends BaseLazyFragment {
                 }
             }
         });
-        subCategoryAdapter.setOnItemClickListener((adapter, view, position) -> {
-            if (getActivity() instanceof HomeActivity) {
-                ((HomeActivity) getActivity()).setPosterBrowseMode(false);
-            }
-            mSubCategoryView.removeCallbacks(subCategoryRunnable);
-            MovieSort.SortData selected = subCategoryAdapter.getItem(position);
-            selectSubCategory(selected);
-        });
+        // 点击事件统一由 mSubCategoryView.OnItemListener.onItemClick 处理，避免遥控器重复触发
     }
 
     private void selectSubCategory(MovieSort.SortData selected) {
         if (selected == null || selected == activeSortData
                 || (activeSortData != null && selected.id != null && selected.id.equals(activeSortData.id))) return;
+        boolean hadSubCategoryFocus = mSubCategoryView != null && mSubCategoryView.hasFocus();
         if (gridFilterDialog != null) {
             gridFilterDialog.dismiss();
             gridFilterDialog = null;
@@ -308,6 +320,35 @@ public class GridFragment extends BaseLazyFragment {
             gridAdapter.setEnableLoadMore(false);
         }
         initData();
+        if (hadSubCategoryFocus) {
+            keepFocusOnSelectedSubCategory();
+        }
+    }
+
+    /** 切换子分类触发骨架屏/网格重绘时，防止焦点丢失回退到左侧导航栏「搜索」 */
+    private void keepFocusOnSelectedSubCategory() {
+        if (mSubCategoryView == null) return;
+        mSubCategoryView.post(() -> {
+            if (!isAdded() || mSubCategoryView == null || subCategoryBar == null
+                    || subCategoryBar.getVisibility() != View.VISIBLE) {
+                return;
+            }
+            if (mSubCategoryView.hasFocus() || (mGridView != null && mGridView.hasFocus())) {
+                return;
+            }
+            int sel = getSelectedSubCategoryPosition();
+            RecyclerView.LayoutManager lm = mSubCategoryView.getLayoutManager();
+            View target = lm != null && sel >= 0 ? lm.findViewByPosition(sel) : null;
+            if (target != null) {
+                target.requestFocus();
+            } else {
+                if (sel >= 0) {
+                    mSubCategoryView.setSelectedPosition(sel);
+                    mSubCategoryView.setSelection(sel);
+                }
+                mSubCategoryView.requestFocus();
+            }
+        });
     }
 
     public boolean focusSubCategoryOrGrid() {
@@ -317,6 +358,11 @@ public class GridFragment extends BaseLazyFragment {
                 if (sel >= 0) {
                     mSubCategoryView.setSelectedPosition(sel);
                     mSubCategoryView.setSelection(sel);
+                    RecyclerView.LayoutManager lm = mSubCategoryView.getLayoutManager();
+                    View target = lm != null ? lm.findViewByPosition(sel) : null;
+                    if (target != null && target.requestFocus()) {
+                        return true;
+                    }
                 }
                 return mSubCategoryView.requestFocus();
             }
@@ -517,7 +563,7 @@ public class GridFragment extends BaseLazyFragment {
         if (isFolederMode()) {
             mGridView.setLayoutManager(new V7LinearLayoutManager(this.mContext, 1, false));
         } else {
-            int spanCount = isBaseOnWidth() ? 4 : 5;
+            int spanCount = 5;
             if (style != null) {
                 spanCount = ImgUtil.spanCountByStyle(style, spanCount);
             }

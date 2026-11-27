@@ -171,8 +171,8 @@ public class UserFragment extends BaseLazyFragment implements View.OnClickListen
                 v.post(this::applyHeroHeight);
             }
         });
-        // 每行 4 张：卡片与分类页（item_grid，vs_214×vs_280）同一尺寸（第四轮用户反馈）
-        int spanCount = 4;
+        // 每行 5 张：与分类页（item_grid，178×226mm）同一尺寸，一屏完整展示两排海报
+        int spanCount = 5;
         if (Hawk.get(HawkConfig.HOME_REC, 0) == 1 && homeSourceRec!=null) {
             style=ImgUtil.initStyle();
         }

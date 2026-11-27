@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 分类 / 历史 / 收藏海报卡片（UI 重构阶段 B：标题移到封面下方，焦点描边改为主色；控件 ID 与原布局一致，适配器无需改动） -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipChildren="false"
     android:clipToPadding="false"
     android:focusable="true"
+    android:gravity="center_horizontal"
     android:orientation="vertical">
 
     <!-- 封面容器：适配器会按站点图片比例改写它的宽高（ivThumb.getParent()） -->
     <com.github.tvbox.osc.ui.tv.widget.RoundClipFrameLayout
         android:id="@+id/mItemFrame"
-        android:layout_width="@dimen/vs_214"
-        android:layout_height="@dimen/vs_280"
+        android:layout_width="@dimen/st_grid_poster_width"
+        android:layout_height="@dimen/st_grid_poster_height"
         android:background="@drawable/st_card_frame_bg"
         android:duplicateParentState="true"
         android:foreground="@drawable/st_card_focus_ring">
@@ -60,14 +61,17 @@
     <TextView
         android:id="@+id/tvName"
         style="@style/Summer.PosterTitle"
+        android:layout_width="@dimen/st_grid_poster_width"
         android:text="Title" />
 
     <TextView
         android:id="@+id/tvNote"
-        style="@style/Summer.PosterSubtitle" />
+        style="@style/Summer.PosterSubtitle"
+        android:layout_width="@dimen/st_grid_poster_width" />
 
     <TextView
         android:id="@+id/tvActor"
         style="@style/Summer.PosterSubtitle"
+        android:layout_width="@dimen/st_grid_poster_width"
         android:visibility="gone" />
 </LinearLayout>
